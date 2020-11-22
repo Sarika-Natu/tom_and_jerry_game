@@ -5,23 +5,35 @@
 
 #include "board_io.h"
 #include "common_macros.h"
+#include "gpio.h"
 #include "periodic_scheduler.h"
 #include "sj2_cli.h"
 
-// 'static' to make these functions 'private' to this file
-static void create_blinky_tasks(void);
-static void create_uart_task(void);
-static void blink_task(void *params);
-static void uart_task(void *params);
+#include "ff.h"
+#include "mp3_decoder.h"
+#include "queue.h"
+#include "semphr.h"
+
+#define READ_BYTES_FROM_FILE 512U
+#define MAX_BYTES_TX 32U
+//#define TEST
+static SemaphoreHandle_t mp3_mutex = NULL;
+static QueueHandle_t mp3_queue = NULL;
+
+void read_song(void *p);
+void play_song(void *p);
 
 int main(void) {
-  create_blinky_tasks();
-  create_uart_task();
 
-  // If you have the ESP32 wifi module soldered on the board, you can try
-  // uncommenting this code See esp32/README.md for more details uart3_init();
-  // // Also include:  uart3_init.h xTaskCreate(esp32_tcp_hello_world_task,
-  // "uart3", 1000, NULL, PRIORITY_LOW, NULL); // Include esp32_task.h
+  mp3_init();
+
+  mp3_mutex = xSemaphoreCreateMutex();
+  mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
+
+  xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void *)NULL,
+              PRIORITY_LOW, NULL);
+  xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
+              PRIORITY_HIGH, NULL);
 
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS scheduler
@@ -30,95 +42,57 @@ int main(void) {
   return 0;
 }
 
-static void create_blinky_tasks(void) {
-  /**
-   * Use '#if (1)' if you wish to observe how two tasks can blink LEDs
-   * Use '#if (0)' if you wish to use the 'periodic_scheduler.h' that will spawn
-   * 4 periodic tasks, one for each LED
-   */
-#if (1)
-  // These variables should not go out of scope because the 'blink_task' will
-  // reference this memory
-  static gpio_s led0, led1;
+void read_song(void *p) {
+  const char *filename = "RangDeBasanti.mp3";
+  static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
+  FRESULT result;
+  FIL file;
 
-  led0 = board_io__get_led0();
-  led1 = board_io__get_led1();
+  result = f_open(&file, filename, FA_OPEN_EXISTING | FA_READ);
+  UINT bytes_read;
+  while (1) {
+    xSemaphoreTake(mp3_mutex, portMAX_DELAY);
 
-  xTaskCreate(blink_task, "led0", configMINIMAL_STACK_SIZE, (void *)&led0,
-              PRIORITY_LOW, NULL);
-  xTaskCreate(blink_task, "led1", configMINIMAL_STACK_SIZE, (void *)&led1,
-              PRIORITY_LOW, NULL);
-#else
-  const bool run_1000hz = true;
-  const size_t stack_size_bytes =
-      2048 / sizeof(void *); // RTOS stack size is in terms of 32-bits for ARM
-                             // M4 32-bit CPU
-  periodic_scheduler__initialize(
-      stack_size_bytes,
-      !run_1000hz); // Assuming we do not need the high rate 1000Hz task
-  UNUSED(blink_task);
-#endif
-}
+    result =
+        f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
+    if (0 != result) {
+      printf("Result of %s is %i\n", filename, result);
+    }
 
-static void create_uart_task(void) {
-  // It is advised to either run the uart_task, or the SJ2 command-line (CLI),
-  // but not both Change '#if (0)' to '#if (1)' and vice versa to try it out
-#if (0)
-  // printf() takes more stack space, size this tasks' stack higher
-  xTaskCreate(uart_task, "uart", (512U * 8) / sizeof(void *), NULL,
-              PRIORITY_LOW, NULL);
-#else
-  sj2_cli__init();
-  UNUSED(uart_task); // uart_task is un-used in if we are doing cli init()
-#endif
-}
-
-static void blink_task(void *params) {
-  const gpio_s led =
-      *((gpio_s *)params); // Parameter was input while calling xTaskCreate()
-
-  // Warning: This task starts with very minimal stack, so do not use printf()
-  // API here to avoid stack overflow
-  while (true) {
-    gpio__toggle(led);
-    vTaskDelay(500);
+    xSemaphoreGive(mp3_mutex);
+    xQueueSend(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
   }
 }
 
-// This sends periodic messages over printf() which uses system_calls.c to send
-// them to UART0
-static void uart_task(void *params) {
-  TickType_t previous_tick = 0;
-  TickType_t ticks = 0;
+void play_song(void *p) {
+  static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
+  static uint8_t current_count = 0;
+  uint32_t start_index = 0;
+  while (1) {
 
-  while (true) {
-    // This loop will repeat at precise task delay, even if the logic below
-    // takes variable amount of ticks
-    vTaskDelayUntil(&previous_tick, 2000);
+    if (current_count == 0) {
+      xQueueReceive(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
+    }
+    start_index = (current_count * MAX_BYTES_TX);
 
-    /* Calls to fprintf(stderr, ...) uses polled UART driver, so this entire
-     * output will be fully sent out before this function returns. See
-     * system_calls.c for actual implementation.
-     *
-     * Use this style print for:
-     *  - Interrupts because you cannot use printf() inside an ISR
-     *    This is because regular printf() leads down to xQueueSend() that might
-     * block but you cannot block inside an ISR hence the system might crash
-     *  - During debugging in case system crashes before all output of printf()
-     * is sent
-     */
-    ticks = xTaskGetTickCount();
-    fprintf(stderr,
-            "%u: This is a polled version of printf used for debugging ... "
-            "finished in",
-            (unsigned)ticks);
-    fprintf(stderr, " %lu ticks\n", (xTaskGetTickCount() - ticks));
+    while (!mp3_dreq_get_status()) {
+#ifdef TEST
+      printf("data not requested\n");
+#endif
+      vTaskDelay(2);
+    }
+    if (xSemaphoreTake(mp3_mutex, portMAX_DELAY)) {
 
-    /* This deposits data to an outgoing queue and doesn't block the CPU
-     * Data will be sent later, but this function would return earlier
-     */
-    ticks = xTaskGetTickCount();
-    printf("This is a more efficient printf ... finished in");
-    printf(" %lu ticks\n\n", (xTaskGetTickCount() - ticks));
+      send_bytes_to_decoder(start_index, &bytes_to_read[0]);
+      xSemaphoreGive(mp3_mutex);
+      if (current_count == (READ_BYTES_FROM_FILE / MAX_BYTES_TX) - 1) {
+        current_count = 0;
+      } else {
+        current_count += 1;
+#ifdef TEST
+        printf("count = %d\n", current_count);
+#endif
+      }
+    }
   }
 }

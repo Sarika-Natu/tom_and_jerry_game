@@ -28,75 +28,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="28f002e9-5578-4d10-bc4f-7dfaaf1137f2" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/entry_point.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/entry_point.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/interrupt_vector_table.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/interrupt_vector_table.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/clock.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/clock.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/crash.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/crash.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/crash.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/crash.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/newlib/syscall.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/newlib/syscall.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/startup/startup.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/startup/startup.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/startup/startup.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l0_lowlevel/startup/startup.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/leightweight_lock.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/leightweight_lock.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/source/leightweight_lock.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/source/leightweight_lock.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/string/sl_string.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/string/sl_string.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/string/sl_string.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/string/sl_string.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/string/test/test_sl_string.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l2_utils/string/test/test_sl_string.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/adc.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/adc.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/can_bus.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/can_bus.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/gpio.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/gpio.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/hw_timer.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/hw_timer.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/i2c.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/i2c.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/lpc_peripherals.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/lpc_peripherals.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/pwm1.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/pwm1.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/adc.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/adc.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/board_io.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/board_io.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/can_bus.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/can_bus.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/gpio.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/gpio.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/hw_timer.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/hw_timer.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/i2c.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/i2c.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/lpc_peripherals.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/lpc_peripherals.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/pwm1.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/pwm1.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/ssp2.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/ssp2.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/uart.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/sources/uart.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/ssp2.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/ssp2.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/uart.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l3_drivers/uart.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/app_cli.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/app_cli.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/app_cli.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/app_cli.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/cli_handlers.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/cli_handlers.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/handlers/handler_i2c.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/handlers/handler_i2c.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/handlers/handlers_general.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/handlers/handlers_general.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/sj2_cli.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/sj2_cli.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/test/test_app_cli.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/cli/test/test_app_cli.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/delay.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/delay.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32_task.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32_task.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32_task.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/esp32/esp32_task.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/examples/file_io_example.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/examples/file_io_example.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/newlib/system_calls.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/newlib/system_calls.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sensors/acceleration.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sensors/acceleration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sensors/sources/acceleration.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sensors/sources/acceleration.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/delay.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/delay.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/peripherals_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/peripherals_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/sys_time.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/sys_time.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/uart_printf.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sources/uart_printf.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/ssp2_mutex.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/ssp2_mutex.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sys_time.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/sys_time.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/uart3_init.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/uart3_init.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/uart_printf.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l4_io/uart_printf.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_callbacks.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_callbacks.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_callbacks.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_callbacks.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_scheduler.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_scheduler.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_scheduler.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/periodic_scheduler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/test/test_periodic_callbacks.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/test/test_periodic_callbacks.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/test/test_periodic_scheduler.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/periodics/test/test_periodic_scheduler.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/rtos_hooks.c" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/l5_application/rtos_hooks.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/portmacro.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/portmacro.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/queue.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/queue.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/semphr.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/semphr.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/task.h" beforeDir="false" afterPath="$PROJECT_DIR$/projects/lpc40xx_freertos/unittest_header_overrides/task.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,6 +38,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="Git.Settings">
@@ -122,6 +57,13 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -131,7 +73,16 @@
       <option name="presentableId" value="Default" />
       <updated>1605377645796</updated>
       <workItem from="1605377646966" duration="1124000" />
+      <workItem from="1606072326834" duration="843000" />
     </task>
+    <task id="LOCAL-00001" summary="Performed Clang formatting. Added .gitignore file">
+      <created>1605659442028</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1605659442029</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -147,15 +98,24 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Performed Clang formatting. Added .gitignore file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Performed Clang formatting. Added .gitignore file" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="8" y="8" width="1424" height="884" maximized="true" key="DiffContextDialog" timestamp="1605656871546">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="8" y="8" width="1424" height="884" maximized="true" key="DiffContextDialog" timestamp="1605659572283">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="8" y="8" width="1424" height="884" maximized="true" key="DiffContextDialog/0.0.1440.900@0.0.1440.900" timestamp="1605656871546" />
     <state x="506" y="159" key="RollbackChangesDialog" timestamp="1605656597681">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="506" y="159" key="RollbackChangesDialog/0.0.1440.900@0.0.1440.900" timestamp="1605656597681" />
+    <state x="241" y="-1194" key="Vcs.Push.Dialog.v2" timestamp="1605659446673">
+      <screen x="-1039" y="-1867" width="3360" height="1867" />
+    </state>
+    <state x="241" y="-1194" key="Vcs.Push.Dialog.v2/0.23.1440.877/-1039.-1867.3360.1867@-1039.-1867.3360.1867" timestamp="1605659446673" />
   </component>
 </project>
