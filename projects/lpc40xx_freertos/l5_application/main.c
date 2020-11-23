@@ -5,7 +5,9 @@
 
 #include "board_io.h"
 #include "common_macros.h"
+#include "delay.h"
 #include "gpio.h"
+#include "led_matrix.h"
 #include "periodic_scheduler.h"
 #include "sj2_cli.h"
 
@@ -20,6 +22,7 @@
 static SemaphoreHandle_t mp3_mutex = NULL;
 static QueueHandle_t mp3_queue = NULL;
 
+static void RGB_task(void *params);
 void read_song(void *p);
 void play_song(void *p);
 
@@ -29,17 +32,37 @@ int main(void) {
 
   mp3_mutex = xSemaphoreCreateMutex();
   mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
-
-  xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void *)NULL,
-              PRIORITY_LOW, NULL);
-  xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
-              PRIORITY_HIGH, NULL);
+  xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
+  // *)NULL,PRIORITY_LOW, NULL);
+  // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
+  // *), (void *)NULL,      PRIORITY_HIGH, NULL);
 
   puts("Starting RTOS");
-  vTaskStartScheduler(); // This function never returns unless RTOS scheduler
-                         // runs out of memory and fails
+  vTaskStartScheduler(); // This function never returns unless RTOS
+                         // scheduler runs out of memory and fails
 
   return 0;
+}
+static void RGB_task(void *params) {
+
+  // uint8_t LEDMATRIX_HALF_HEIGHT = 32;
+  // uint8_t LEDMATRIX_WIDTH = 64;
+  gpio_init();
+  // clear_display();
+  while (1) {
+    // update_display();
+    // display_rectangle_pink();
+    // update_display();
+    // display_rectangle_red();
+    // display_moving_image(2, 29);
+    // move_rectangle();
+    display_maze();
+    display_image();
+    // update_display();
+    // set_pixel(4, 6, PINK);
+    // update_display();
+  }
 }
 
 void read_song(void *p) {
