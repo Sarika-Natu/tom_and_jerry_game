@@ -3,6 +3,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "acceleration.h"
 #include "board_io.h"
 #include "common_macros.h"
 #include "delay.h"
@@ -16,11 +17,13 @@
 #include "queue.h"
 #include "semphr.h"
 
+//#define CODE
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
 //#define TEST
 static SemaphoreHandle_t mp3_mutex = NULL;
 static QueueHandle_t mp3_queue = NULL;
+void action_on_orientation(void *p);
 
 static void RGB_task(void *params);
 void read_song(void *p);
@@ -28,6 +31,7 @@ void play_song(void *p);
 
 int main(void) {
 
+#ifdef CODE
   mp3_init();
 
   mp3_mutex = xSemaphoreCreateMutex();
@@ -38,12 +42,46 @@ int main(void) {
   // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
   // *), (void *)NULL,      PRIORITY_HIGH, NULL);
 
+#endif
+  xTaskCreate(action_on_orientation, "Performing_Action",
+              4096 / (sizeof(void *)), NULL, PRIORITY_LOW, NULL);
+
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS
                          // scheduler runs out of memory and fails
 
   return 0;
 }
+
+void action_on_orientation(void *p) {
+  orientation_e value;
+
+  while (1) {
+    value = acceleration_get_data();
+    switch (value) {
+    case Landscape_LEFT:
+      printf("TURN LEFT\n\n");
+      break;
+    case Landscape_RIGHT:
+      printf("TURN RIGHT\n\n");
+      break;
+    case Back_Orientation:
+      printf("Back Orientation\n");
+      break;
+    case Front_Orientation:
+      printf("STABLE ORIENTATION\n\n");
+      break;
+    case Portrait_DOWN:
+      printf("MOVE FORWARD\n\n");
+      break;
+    default:
+      printf("STEP BACK\n\n");
+      break;
+    }
+    vTaskDelay(100);
+  }
+}
+
 static void RGB_task(void *params) {
 
   // uint8_t LEDMATRIX_HALF_HEIGHT = 32;
