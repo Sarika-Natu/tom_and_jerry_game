@@ -3,85 +3,60 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+//#include "acceleration.h"
 #include "board_io.h"
 #include "common_macros.h"
 #include "delay.h"
-#include "gpio.h"
-#include "led_matrix.h"
-#include "periodic_scheduler.h"
-#include "sj2_cli.h"
-
-//#include "accelerometer_orientation.h"
 #include "ff.h"
+#include "game_accelerometer.h"
+#include "gpio.h"
 #include "i2c.h"
+#include "led_matrix.h"
 #include "mp3_decoder.h"
+#include "periodic_scheduler.h"
 #include "queue.h"
 #include "semphr.h"
+#include "sj2_cli.h"
 
+#define CODE
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
 //#define TEST
 static SemaphoreHandle_t mp3_mutex = NULL;
 static QueueHandle_t mp3_queue = NULL;
-
-typedef enum {
-  Front_Orientation = 0,
-  Back_Orientation = 1,
-  Portrait_DOWN = 2,
-  Landscape_RIGHT = 4,
-  Landscape_LEFT = 6,
-} orientation_e;
-
-typedef enum {
-  acceleration__PL_status_address = 0x10,
-  acceleration__PL_CFG_address = 0x11,
-  acceleration__PL_count_address = 0x12,
-  acceleration__memory_control = 0x2A,
-  acceleration__Stand_by = 254,
-} acceleration__orientation;
-
-static const i2c_e acceleration__sensor_bus = I2C__2;
-static const uint8_t acceleration__address = 0x38;
-uint8_t enable_orientation_detection = 192;
-uint8_t decrement_debounce_counter = 5;
-
-void enable_orientation(void);
 void action_on_orientation(void *p);
-orientation_e acceleration_get_data(void);
+
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
+void read_song(void *p);
+void play_song(void *p);
 
 int main(void) {
 
-  // mp3_init();
+#ifdef CODE
+  mp3_init();
 
-  // mp3_mutex = xSemaphoreCreateMutex();
-  // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
-  // const uint8_t active_mode_with_100Hz = (1 << 0) | (1 << 5);
-
-  // i2c__write_single(acceleration__sensor_bus, acceleration__address,
-  //                   acceleration__memory_control, acceleration__Stand_by);
-
-  // enable_orientation();
-
-  // i2c__write_single(acceleration__sensor_bus, acceleration__address,
-  //                   acceleration__memory_control, active_mode_with_100Hz);
+  mp3_mutex = xSemaphoreCreateMutex();
+  mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
   xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
-  // *)NULL,PRIORITY_LOW, NULL);
+  // *)NULL, PRIORITY_LOW, NULL);
   // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
-  // *), (void *)NULL,PRIORITY_HIGH, NULL);
-  // xTaskCreate(action_on_orientation, "Performing_Action",4096 / (sizeof(void
-  // *)), NULL, PRIORITY_LOW, NULL);
+  // *), (void *)NULL, PRIORITY_HIGH, NULL);
+
+#endif
+  xTaskCreate(action_on_orientation, "Performing_Action",
+              4096 / (sizeof(void *)), NULL, PRIORITY_HIGH, NULL);
+
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS
                          // scheduler runs out of memory and fails
 
   return 0;
 }
-uint8_t x = 0;
+
 static void RGB_frame(void *params) {
 
   // uint8_t LEDMATRIX_HALF_HEIGHT = 32;
@@ -180,40 +155,6 @@ void play_song(void *p) {
       }
     }
   }
-}
-
-void enable_orientation(void) {
-  i2c__write_single(acceleration__sensor_bus, acceleration__address,
-                    acceleration__PL_CFG_address, enable_orientation_detection);
-
-  i2c__write_single(acceleration__sensor_bus, acceleration__address,
-                    acceleration__PL_count_address, decrement_debounce_counter);
-}
-
-orientation_e acceleration_get_data(void) {
-  orientation_e orientation_status;
-
-  uint8_t PL_status_reg =
-      i2c__read_single(acceleration__sensor_bus, acceleration__address,
-                       acceleration__PL_status_address);
-
-  printf("STATUS REG AFTER READING = 0x%x\n", PL_status_reg);
-
-  if (PL_status_reg & (~(1 << 0)) & (~(1 << 1)) & (~(1 << 2))) {
-    orientation_status = 0; // FRONT
-  } else if (PL_status_reg == 2) {
-    orientation_status = 2; // DOWN
-  } else if (PL_status_reg == 4) {
-    orientation_status = 4; // RIGHT
-  } else if (PL_status_reg == 6) {
-    orientation_status = 6; // LEFT
-  } else if (PL_status_reg & (1 << 0)) {
-    orientation_status = 1; // BACK
-  } else {
-    orientation_status = 0xA;
-  }
-  printf("STATUS = %d\n", orientation_status);
-  return orientation_status;
 }
 
 void action_on_orientation(void *p) {
