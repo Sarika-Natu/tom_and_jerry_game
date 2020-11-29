@@ -1,5 +1,6 @@
 #include "led_matrix.h"
 #include "delay.h"
+#include "ff.h"
 #include "gpio.h"
 
 uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH];
@@ -22,7 +23,6 @@ void clear_display(void) {
   gpio__reset(RGB.R2);
   gpio__reset(RGB.G2);
 }
-
 void gpio_init(void) {
 
   gpio__set_function(RGB.B2, GPIO__FUNCITON_0_IO_PIN);
@@ -106,11 +106,11 @@ void set_pixel(int8_t row, int8_t col, color_t color) {
     return;
 
   if (row >= LEDMATRIX_HALF_HEIGHT) {
-    fprintf(stderr, "row %d col %d\n", row, col);
+    // fprintf(stderr, "row %d col %d\n", row, col);
     display_matrix[row % LEDMATRIX_HALF_HEIGHT][col] |= (color << 4);
-    fprintf(stderr, "row %d col %d\n", row, col);
+    // fprintf(stderr, "row %d col %d\n", row, col);
   } else {
-    fprintf(stderr, "row %d col %d\n", row, col);
+    // fprintf(stderr, "row %d col %d\n", row, col);
     display_matrix[row][col] |= (color);
   }
 }
@@ -233,4 +233,127 @@ void display_image(void) {
   set_pixel(i + 1, 14, PINK);
 
   update_display();
+}
+
+void game_frame(void) {
+  for (uint8_t x = 0; x < LEDMATRIX_HEIGHT; x++) {
+    for (uint8_t y = 0; y < LEDMATRIX_WIDTH; y++) {
+      if (x < 2) {
+        set_pixel(x, y, PINK);
+        update_display();
+      } else if (x >= 30) {
+        set_pixel(x, y, PINK);
+        update_display();
+      } else if (y < 2) {
+        set_pixel(x, y, PINK);
+        update_display();
+      } else if (y >= 62) {
+        set_pixel(x, y, PINK);
+        update_display();
+      } else if (x > 1 && x < 24 && y > 1 && y < 15) {
+        set_pixel(x, y, CYAN);
+        update_display();
+      } else if ((x > 1 && x < 6 && y > 14 && y < 50) || (y >= 55 && x < 6)) {
+        set_pixel(x, y, CYAN);
+        update_display();
+      } else {
+        set_pixel(x, y, BLACK);
+        update_display();
+      }
+    }
+  }
+}
+void display_rectangle_cyan(void) {
+  for (uint8_t x = 10; x < 20; x++) {
+    for (uint8_t y = 20; y < 50; y++) {
+      set_pixel(x, y, CYAN);
+      update_display();
+    }
+  }
+}
+
+void display_rectangle_cyan_small(void) {
+  for (uint8_t x = 24; x < 30; x++) {
+    for (uint8_t y = 20; y < 50; y++) {
+      set_pixel(x, y, GREEN);
+      update_display();
+    }
+  }
+}
+
+void display_rectangle_cyan_big(void) {
+  for (uint8_t x = 10; x < 30; x++) {
+    for (uint8_t y = 55; y < 62; y++) {
+      set_pixel(x, y, YELLOW);
+      update_display();
+    }
+  }
+}
+
+void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
+                             uint8_t width_y, color_t color) {
+
+  for (uint8_t i = x; i <= width_x; i++) {
+    for (uint8_t j = y; j <= width_y; j++) {
+      set_pixel(i, j, color);
+      update_display();
+    }
+  }
+}
+
+void display_moving_point(uint8_t x, uint8_t y, color_t color) {
+  // for (uint8_t i = x; i <= x + 2; i++) {
+  for (uint8_t j = y; j <= y + 50; j++) {
+    set_pixel(x, j, color);
+    set_pixel(x + 1, j, color);
+    update_display();
+    clear_pixel(x, j);
+    clear_pixel(x + 1, j);
+    update_display();
+    vTaskDelay(10);
+  }
+  // }
+}
+
+void display_up_arrow(void) {
+  set_pixel(26, 2, RED);
+
+  set_pixel(25, 4, RED);
+
+  set_pixel(26, 3, RED);
+
+  set_pixel(27, 4, RED);
+  set_pixel(26, 4, RED);
+  set_pixel(26, 5, RED);
+  set_pixel(27, 2, RED);
+  set_pixel(27, 3, RED);
+  set_pixel(28, 4, RED);
+  set_pixel(27, 5, RED);
+
+  update_display();
+  clear_pixel(26, 2);
+  clear_pixel(25, 4);
+
+  // clear_pixel(28, 2);
+  // clear_pixel(28, 3);
+  // clear_pixel(29, 2);
+  // clear_pixel(29, 3);
+  // update_display();
+  // delay__ms(10);
+  // clear_display();
+  // update_display();
+}
+
+void display_maze_frame1(void) {
+  display_rectangle_width(0, 0, 1, 50, PINK);
+  display_rectangle_width(2, 0, 24, 1, PINK);
+  display_rectangle_width(30, 0, 31, 63, PINK);
+  display_rectangle_width(2, 62, 31, 63, PINK);
+  display_rectangle_width(0, 55, 1, 63, PINK);
+  display_rectangle_width(2, 2, 24, 14, CYAN);
+  display_rectangle_width(10, 20, 20, 50, GREEN);
+  display_rectangle_width(27, 20, 29, 50, BLUE);
+  display_rectangle_width(10, 55, 29, 61, YELLOW);
+  display_rectangle_width(2, 15, 5, 50, CYAN);
+  display_rectangle_width(2, 55, 5, 61, RED);
 }

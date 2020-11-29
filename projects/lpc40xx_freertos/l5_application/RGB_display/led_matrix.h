@@ -63,3 +63,15 @@ void display_moving_image(uint8_t x, uint8_t y);
 void move_rectangle(void);
 void display_maze(void);
 void display_image(void);
+void display_acc_value(uint8_t x);
+void game_frame(void);
+void display_rectangle_cyan(void);
+void display_rectangle_cyan_small(void);
+void display_rectangle_cyan_big(void);
+void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
+                             uint8_t width_y, color_t color);
+
+void display_moving_point(uint8_t x, uint8_t y, color_t color);
+
+void display_up_arrow(void);
+void display_maze_frame1(void);
