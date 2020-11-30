@@ -33,19 +33,19 @@ void play_song(void *p);
 
 int main(void) {
   // mp3_init();
-
+  gpio_init();
   // mp3_mutex = xSemaphoreCreateMutex();
   // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
-  xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
-  // xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  // xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
   // *)NULL, PRIORITY_LOW, NULL);
   // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
   // *), (void *)NULL, PRIORITY_HIGH, NULL);
 
-  xTaskCreate(action_on_orientation, "Performing_Action",
-              4096 / (sizeof(void *)), NULL, PRIORITY_HIGH, NULL);
+  // xTaskCreate(action_on_orientation, "Performing_Action",    4096 /
+  // (sizeof(void *)), NULL, PRIORITY_HIGH, NULL);
 
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS
@@ -64,7 +64,14 @@ static void RGB_frame(void *params) {
 
 void RGB_task(void *params) {
   while (1) {
-    display_moving_point(25, 3, RED);
+    for (uint8_t x = 0; x < 23; x++) {
+      for (uint8_t y = 0; y < 50; y++) {
+        // display_moving_point(25, 3, RED);
+        tom_image(x, y);
+        vTaskDelay(25);
+        tom_clear_image(x, y);
+      }
+    }
   }
 }
 

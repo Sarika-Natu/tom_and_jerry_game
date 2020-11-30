@@ -76,3 +76,5 @@ void display_moving_point(uint8_t x, uint8_t y, color_t color);
 void display_up_arrow(void);
 void display_maze_frame1(void);
 void maze_one_frame(void);
+void tom_image(uint8_t x, uint8_t y);
+void tom_clear_image(uint8_t x, uint8_t y);

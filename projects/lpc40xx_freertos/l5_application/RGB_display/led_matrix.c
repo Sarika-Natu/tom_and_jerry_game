@@ -475,3 +475,46 @@ void maze_one_frame(void) {
     row_counter = 0;
   }
 }
+
+void tom_image(uint8_t x, uint8_t y) {
+  set_pixel(x, y, BLUE);
+  set_pixel(x + 1, y, BLUE);
+  set_pixel(x + 2, y, BLUE);
+  set_pixel(x - 1, y + 1, BLUE);
+  set_pixel(x + 1, y + 1, BLUE);
+  set_pixel(x + 2, y + 1, BLUE);
+  set_pixel(x + 3, y + 1, BLUE);
+  set_pixel(x - 1, y + 2, BLUE);
+  set_pixel(x, y + 2, BLUE);
+  set_pixel(x + 1, y + 2, BLUE);
+  set_pixel(x + 3, y + 2, BLUE);
+  set_pixel(x - 1, y + 3, BLUE);
+  set_pixel(x + 1, y + 3, BLUE);
+  set_pixel(x + 2, y + 3, BLUE);
+  set_pixel(x + 3, y + 3, BLUE);
+  set_pixel(x, y + 4, BLUE);
+  set_pixel(x + 1, y + 4, BLUE);
+  set_pixel(x + 2, y + 4, BLUE);
+  update_display();
+}
+
+void tom_clear_image(uint8_t x, uint8_t y) {
+  clear_pixel(x, y);
+  clear_pixel(x + 1, y);
+  clear_pixel(x + 2, y);
+  clear_pixel(x - 1, y + 1);
+  clear_pixel(x + 1, y + 1);
+  clear_pixel(x + 2, y + 1);
+  clear_pixel(x + 3, y + 1);
+  clear_pixel(x - 1, y + 2);
+  clear_pixel(x, y + 2);
+  clear_pixel(x + 1, y + 2);
+  clear_pixel(x + 3, y + 2);
+  clear_pixel(x - 1, y + 3);
+  clear_pixel(x + 1, y + 3);
+  clear_pixel(x + 2, y + 3);
+  clear_pixel(x + 3, y + 3);
+  clear_pixel(x, y + 4);
+  clear_pixel(x + 1, y + 4);
+  clear_pixel(x + 2, y + 4);
+}
