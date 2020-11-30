@@ -21,7 +21,7 @@
 #define CODE
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
-//#define TEST
+
 static SemaphoreHandle_t mp3_mutex = NULL;
 static QueueHandle_t mp3_queue = NULL;
 void action_on_orientation(void *p);
@@ -32,21 +32,18 @@ void read_song(void *p);
 void play_song(void *p);
 
 int main(void) {
+  // mp3_init();
 
-#ifdef CODE
-  mp3_init();
-
-  mp3_mutex = xSemaphoreCreateMutex();
-  mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
+  // mp3_mutex = xSemaphoreCreateMutex();
+  // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
-  xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  // xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
   // *)NULL, PRIORITY_LOW, NULL);
   // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
   // *), (void *)NULL, PRIORITY_HIGH, NULL);
 
-#endif
   xTaskCreate(action_on_orientation, "Performing_Action",
               4096 / (sizeof(void *)), NULL, PRIORITY_HIGH, NULL);
 
@@ -58,47 +55,16 @@ int main(void) {
 }
 
 static void RGB_frame(void *params) {
-
-  // uint8_t LEDMATRIX_HALF_HEIGHT = 32;
-  // uint8_t LEDMATRIX_WIDTH = 64;
   gpio_init();
-  // clear_display();
   while (1) {
-    // update_display();
-    // display_rectangle_pink();
-    // update_display();
-    // display_rectangle_red();
-    // display_moving_image(2, 29);
-    // move_rectangle();
-    // display_maze();
-    // display_image();
-    // display_acc_value(x);
-    // game_frame();
-    // display_rectangle_cyan();
-    // display_rectangle_cyan_small();
-    // display_rectangle_cyan_big();
-
-    // final logic
-    display_maze_frame1();
-
-    // display_up_arrow();
-    // display_moving_point(27, 2, RED);
-    // display_moving_point(1, 2, BLUE);
-
-    // display_moving_point(6, 7, RED);
-    // x++;
-    // update_display();
-    // set_pixel(4, 6, PINK);
-    // update_display();
+    // display_maze_frame1();
+    maze_one_frame();
   }
 }
 
 void RGB_task(void *params) {
   while (1) {
     display_moving_point(25, 3, RED);
-    // display_moving_point(24, 15, RED);
-    // vTaskDelay(2000);
-    // fprintf(stderr, "in");
   }
 }
 

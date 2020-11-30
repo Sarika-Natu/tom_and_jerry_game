@@ -75,3 +75,4 @@ void display_moving_point(uint8_t x, uint8_t y, color_t color);
 
 void display_up_arrow(void);
 void display_maze_frame1(void);
+void maze_one_frame(void);
