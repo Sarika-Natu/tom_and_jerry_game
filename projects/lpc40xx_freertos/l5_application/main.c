@@ -24,7 +24,15 @@
 
 static SemaphoreHandle_t mp3_mutex = NULL;
 static QueueHandle_t mp3_queue = NULL;
+
 void action_on_orientation(void *p);
+SemaphoreHandle_t movement_counter = NULL;
+void left_movement(void);
+void right_movement(void);
+void up_movement(void);
+void down_movement(void);
+volatile uint8_t xcount = 0;
+volatile uint8_t ycount = 0;
 
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
@@ -33,19 +41,21 @@ void play_song(void *p);
 
 int main(void) {
   // mp3_init();
+  movement_counter = xSemaphoreCreateMutex();
+
   gpio_init();
   // mp3_mutex = xSemaphoreCreateMutex();
   // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   // xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
-  xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  // xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
   // *)NULL, PRIORITY_LOW, NULL);
   // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
   // *), (void *)NULL, PRIORITY_HIGH, NULL);
 
-  // xTaskCreate(action_on_orientation, "Performing_Action",    4096 /
-  // (sizeof(void *)), NULL, PRIORITY_HIGH, NULL);
+  xTaskCreate(action_on_orientation, "Performing_Action",
+              4096 / (sizeof(void *)), NULL, PRIORITY_HIGH, NULL);
 
   puts("Starting RTOS");
   vTaskStartScheduler(); // This function never returns unless RTOS
@@ -132,29 +142,62 @@ void play_song(void *p) {
 
 void action_on_orientation(void *p) {
   orientation_e value;
+  // uint8_t tom_movement;
 
   while (1) {
     value = acceleration_get_data();
     switch (value) {
     case Landscape_LEFT:
-      printf("Direction LEFT\n\n");
+      left_movement();
       break;
     case Landscape_RIGHT:
-      printf("Direction RIGHT\n\n");
+      right_movement();
       break;
     case Back_Orientation:
-      printf("Back Orientation\n\n");
+      printf("Back orientation\n\n");
       break;
     case Front_Orientation:
       printf("Front orientation\n\n");
       break;
     case Portrait_DOWN:
-      printf("Down orientation\n\n");
+      down_movement();
       break;
     default:
-      printf("Incorrect Orientation\n\n");
+      up_movement();
       break;
     }
     vTaskDelay(100);
   }
+  // return tom_movement;
+}
+
+void left_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+    fprintf(stderr, "Direction LEFT = %d\n\n", xcount--);
+  }
+  vTaskDelay(100);
+  xSemaphoreGive(movement_counter);
+}
+
+void right_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+    fprintf(stderr, "Direction RIGHT = %d\n\n", xcount++);
+  }
+  vTaskDelay(100);
+  xSemaphoreGive(movement_counter);
+}
+void down_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+    fprintf(stderr, "Direction DOWN = %d\n\n", ycount--);
+  }
+  vTaskDelay(100);
+  xSemaphoreGive(movement_counter);
+}
+
+void up_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+    fprintf(stderr, "Direction UP = %d\n\n", ycount++);
+  }
+  vTaskDelay(100);
+  xSemaphoreGive(movement_counter);
 }
