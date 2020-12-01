@@ -64,4 +64,3 @@ orientation_e acceleration_get_data(void) {
   printf("STATUS = %d\n", orientation_status);
   return orientation_status;
 }
-

@@ -31,8 +31,8 @@ void left_movement(void);
 void right_movement(void);
 void up_movement(void);
 void down_movement(void);
-volatile uint8_t xcount = 0;
-volatile uint8_t ycount = 0;
+volatile uint8_t col_count = 0;
+volatile uint8_t row_count = 0;
 
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
@@ -173,7 +173,7 @@ void action_on_orientation(void *p) {
 
 void left_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction LEFT = %d\n\n", xcount--);
+    fprintf(stderr, "Direction LEFT = %d\n\n", col_count--);
   }
   vTaskDelay(100);
   xSemaphoreGive(movement_counter);
@@ -181,14 +181,14 @@ void left_movement(void) {
 
 void right_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction RIGHT = %d\n\n", xcount++);
+    fprintf(stderr, "Direction RIGHT = %d\n\n", col_count++);
   }
   vTaskDelay(100);
   xSemaphoreGive(movement_counter);
 }
 void down_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction DOWN = %d\n\n", ycount--);
+    fprintf(stderr, "Direction DOWN = %d\n\n", row_count--);
   }
   vTaskDelay(100);
   xSemaphoreGive(movement_counter);
@@ -196,7 +196,7 @@ void down_movement(void) {
 
 void up_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction UP = %d\n\n", ycount++);
+    fprintf(stderr, "Direction UP = %d\n\n", row_count++);
   }
   vTaskDelay(100);
   xSemaphoreGive(movement_counter);
