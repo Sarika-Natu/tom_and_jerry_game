@@ -31,13 +31,14 @@ void left_movement(void);
 void right_movement(void);
 void up_movement(void);
 void down_movement(void);
-volatile uint8_t col_count = 0;
-volatile uint8_t row_count = 0;
+uint8_t col_count = 0;
+uint8_t row_count = 0;
 
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
 void read_song(void *p);
 void play_song(void *p);
+void RGB_clear(void *p);
 
 int main(void) {
   // mp3_init();
@@ -48,7 +49,8 @@ int main(void) {
   // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   // xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
-  // xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
   // *)NULL, PRIORITY_LOW, NULL);
   // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void
@@ -67,21 +69,20 @@ int main(void) {
 static void RGB_frame(void *params) {
   gpio_init();
   while (1) {
-    // display_maze_frame1();
+
     maze_one_frame();
   }
 }
 
 void RGB_task(void *params) {
   while (1) {
-    for (uint8_t x = 0; x < 23; x++) {
-      for (uint8_t y = 0; y < 50; y++) {
-        // display_moving_point(25, 3, RED);
-        tom_image(x, y);
-        vTaskDelay(25);
-        tom_clear_image(x, y);
-      }
-    }
+
+    vTaskDelay(10);
+    tom_image(row_count, col_count);
+    vTaskDelay(5);
+    tom_clear_image(row_count, col_count);
+
+    vTaskDelay(20);
   }
 }
 
@@ -142,7 +143,6 @@ void play_song(void *p) {
 
 void action_on_orientation(void *p) {
   orientation_e value;
-  // uint8_t tom_movement;
 
   while (1) {
     value = acceleration_get_data();
@@ -154,10 +154,10 @@ void action_on_orientation(void *p) {
       right_movement();
       break;
     case Back_Orientation:
-      printf("Back orientation\n\n");
+
       break;
     case Front_Orientation:
-      printf("Front orientation\n\n");
+
       break;
     case Portrait_DOWN:
       down_movement();
@@ -168,36 +168,39 @@ void action_on_orientation(void *p) {
     }
     vTaskDelay(100);
   }
-  // return tom_movement;
 }
 
 void left_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction LEFT = %d\n\n", col_count--);
+
+    col_count--;
   }
-  vTaskDelay(100);
+
   xSemaphoreGive(movement_counter);
 }
 
 void right_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction RIGHT = %d\n\n", col_count++);
+
+    col_count++;
   }
-  vTaskDelay(100);
+
   xSemaphoreGive(movement_counter);
 }
 void down_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction DOWN = %d\n\n", row_count--);
+
+    row_count--;
   }
-  vTaskDelay(100);
+
   xSemaphoreGive(movement_counter);
 }
 
 void up_movement(void) {
   if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-    fprintf(stderr, "Direction UP = %d\n\n", row_count++);
+
+    row_count++;
   }
-  vTaskDelay(100);
+
   xSemaphoreGive(movement_counter);
 }

@@ -495,6 +495,9 @@ void tom_image(uint8_t x, uint8_t y) {
   set_pixel(x, y + 4, BLUE);
   set_pixel(x + 1, y + 4, BLUE);
   set_pixel(x + 2, y + 4, BLUE);
+  set_pixel(x, y + 1, YELLOW);
+  set_pixel(x, y + 3, YELLOW);
+  set_pixel(x + 2, y + 2, RED);
   update_display();
 }
 
@@ -517,4 +520,7 @@ void tom_clear_image(uint8_t x, uint8_t y) {
   clear_pixel(x, y + 4);
   clear_pixel(x + 1, y + 4);
   clear_pixel(x + 2, y + 4);
+  clear_pixel(x, y + 3);
+  clear_pixel(x + 2, y + 2);
+  clear_pixel(x, y + 1);
 }
