@@ -78,3 +78,6 @@ void display_maze_frame1(void);
 void maze_one_frame(void);
 void tom_image(uint8_t x, uint8_t y);
 void tom_clear_image(uint8_t x, uint8_t y);
+void tom_image_1(uint8_t x, uint8_t y);
+void jerry_image(uint8_t x, uint8_t y);
+void jerry_image_clear(uint8_t x, uint8_t y);

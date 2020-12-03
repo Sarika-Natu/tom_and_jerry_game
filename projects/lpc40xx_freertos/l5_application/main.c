@@ -47,8 +47,8 @@ int main(void) {
   gpio_init();
   // mp3_mutex = xSemaphoreCreateMutex();
   // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
-
-  // xTaskCreate(RGB_frame, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
+  clear_display();
+  // xTaskCreate(RGB_frame, "RGB_frame", 4096, NULL, PRIORITY_HIGH, NULL);
   xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
 
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void *), (void
@@ -77,12 +77,21 @@ static void RGB_frame(void *params) {
 void RGB_task(void *params) {
   while (1) {
 
-    vTaskDelay(10);
-    tom_image(row_count, col_count);
-    vTaskDelay(5);
-    tom_clear_image(row_count, col_count);
+    // vTaskDelay(10);
+    // // tom_image(row_count, col_count);
+    // vTaskDelay(5);
+    // tom_clear_image(row_count, col_count);
+    // tom_image_1(3, 4);
+    // jerry_image(15, 15);
 
-    vTaskDelay(20);
+    // vTaskDelay(10);
+    // delay__ms(15);
+    jerry_image(row_count, col_count);
+    vTaskDelay(25);
+
+    // delay__ms(5);
+    jerry_image_clear(row_count, col_count);
+    delay__ms(25);
   }
 }
 
