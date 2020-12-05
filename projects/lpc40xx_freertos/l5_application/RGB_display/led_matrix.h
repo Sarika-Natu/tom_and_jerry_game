@@ -67,3 +67,4 @@ void jerry_image(uint8_t x, uint8_t y);
 void jerry_image_clear(uint8_t x, uint8_t y);
 void tom_image_2_clear(uint8_t x, uint8_t y);
 void tom_image_2(uint8_t x, uint8_t y);
+void jerry_move_on_maze(uint8_t x, uint8_t y);

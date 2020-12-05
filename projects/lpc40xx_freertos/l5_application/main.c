@@ -98,7 +98,8 @@ void RGB_task(void *params) {
 void RGB_task_2(void *params) {
 
   while (1) {
-    jerry_image(row_count, col_count);
+    // jerry_image(row_count, col_count);
+    jerry_move_on_maze(row_count, col_count);
     vTaskDelay(1);
   }
 }
