@@ -218,16 +218,20 @@ void tom_image_2(uint8_t x, uint8_t y) {
 
 void jerry_image(void) {
 
-  for (uint8_t y = 0; y < 64; y++) {
-    for (uint8_t x = 0; x < 32; x++) {
-      if (maze_one_lookup_table[x][y] == 12) {
-        set_pixel(x, y, YELLOW);
-        set_pixel(x - 2, y, YELLOW);
-        set_pixel(x - 1, y + 1, YELLOW);
-        delay__ms(250);
-        clear_pixel(x, y);
-        clear_pixel(x - 2, y);
-        clear_pixel(x - 1, y + 1);
+  for (uint8_t counter = 12; counter < 57; counter++) {
+    for (uint8_t y = 0; y < 64; y++) {
+      for (uint8_t x = 0; x < 32; x++) {
+        if (maze_one_lookup_table[x][y] == counter) {
+          set_pixel(x, y, YELLOW);
+          set_pixel(x + 2, y, YELLOW);
+          set_pixel(x + 1, y, YELLOW);
+          set_pixel(x + 1, y + 1, YELLOW);
+          delay__ms(200);
+          clear_pixel(x, y);
+          clear_pixel(x + 2, y);
+          clear_pixel(x + 1, y);
+          clear_pixel(x + 1, y + 1);
+        }
       }
     }
   }
