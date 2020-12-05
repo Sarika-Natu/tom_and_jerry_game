@@ -46,7 +46,7 @@ orientation_e acceleration_get_data(void) {
       i2c__read_single(acceleration__sensor_bus, acceleration__address,
                        acceleration__PL_status_address);
 
-  printf("STATUS REG AFTER READING = 0x%x\n", PL_status_reg);
+  // printf("STATUS REG AFTER READING = 0x%x\n", PL_status_reg);
 
   if (PL_status_reg & (~(1 << 0)) & (~(1 << 1)) & (~(1 << 2))) {
     orientation_status = 0; // FRONT
@@ -61,6 +61,6 @@ orientation_e acceleration_get_data(void) {
   } else {
     orientation_status = 0xA;
   }
-  printf("STATUS = %d\n", orientation_status);
+  // printf("STATUS = %d\n", orientation_status);
   return orientation_status;
 }
