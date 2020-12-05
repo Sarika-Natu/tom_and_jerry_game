@@ -35,8 +35,6 @@ void down_movement(void);
 uint8_t col_count = 0;
 uint8_t row_count = 0;
 
-TaskHandle_t frame;
-
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
 void read_song(void *p);
@@ -44,27 +42,22 @@ void play_song(void *p);
 void RGB_clear(void *p);
 
 void RGB_task_2(void *params);
-void RGB_jerry_clear(void *params);
 
 bool jerry_check;
 
 int main(void) {
   // mp3_init();
   movement_counter = xSemaphoreCreateMutex();
-  rgb_owner = xSemaphoreCreateMutex();
 
   gpio_init();
 
   acceleration__init();
   // mp3_mutex = xSemaphoreCreateMutex();
   // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
-  // clear_display();
-  xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
-              PRIORITY_MEDIUM, &frame);
-  // xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
 
-  // xTaskCreate(RGB_frame, "RGB_frame", 4096 / (sizeof(void *)), NULL,
-  // PRIORITY_HIGH, NULL);
+  xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
+              PRIORITY_MEDIUM, NULL);
+
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
   xTaskCreate(RGB_task_2, "RGB_task_2", 4096 / (sizeof(void *)), NULL,
@@ -88,13 +81,9 @@ int main(void) {
 }
 
 static void RGB_frame(void *params) {
-  // gpio_init();
+
   while (1) {
-
     maze_one_frame();
-
-    //
-
     vTaskDelay(1);
   }
 }
@@ -102,7 +91,6 @@ static void RGB_frame(void *params) {
 void RGB_task(void *params) {
   while (1) {
     update_display();
-    jerry_check = true;
     vTaskDelay(5);
   }
 }
