@@ -27,6 +27,7 @@ static QueueHandle_t mp3_queue = NULL;
 
 void action_on_orientation(void *p);
 SemaphoreHandle_t movement_counter = NULL;
+SemaphoreHandle_t rgb_owner = NULL;
 void left_movement(void);
 void right_movement(void);
 void up_movement(void);
@@ -34,15 +35,18 @@ void down_movement(void);
 uint8_t col_count = 0;
 uint8_t row_count = 0;
 
-static void game_start_display(void *params);
-static SemaphoreHandle_t switch_press_indication;
+TaskHandle_t frame;
+
 static void RGB_task(void *params);
-static void RGB_frame(void);
-static void play_the_game(void *params);
-static void switch_game_start_maze_display_task(void *params);
+static void RGB_frame(void *params);
+
 void read_song(void *p);
 void play_song(void *p);
 void RGB_clear(void *p);
+
+void RGB_task_2(void *params);
+
+bool jerry_check;
 
 int main(void) {
 
@@ -51,23 +55,18 @@ int main(void) {
   gpio_init();
 
   clear_display();
-  switch_press_indication = xSemaphoreCreateBinary();
-  // static gpio_s change_display_switch_press = {1, 15};
 
-  xTaskCreate(play_the_game, "Play_Game", 4096, NULL, PRIORITY_HIGH, NULL);
-  xTaskCreate(switch_game_start_maze_display_task, "Switch_Press", 1024, NULL,
+  acceleration__init();
+
+  xTaskCreate(RGB_frame, "RGB_frame", 4096, NULL, PRIORITY_MEDIUM, NULL);
+
+  xTaskCreate(RGB_task, "RGB_task", 1024 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
+  xTaskCreate(RGB_task_2, "Jerry_Move", 4096 / (sizeof(void *)), NULL,
+              PRIORITY_MEDIUM, NULL);
 
-  // xTaskCreate(RGB_frame, "RGB_frame", 4096, NULL, PRIORITY_HIGH, NULL);
-  xTaskCreate(game_start_display, "Game_Start", 4096, NULL, PRIORITY_HIGH,
-              NULL);
-  // xTaskCreate(RGB_task, "RGB_task", 2048, NULL, PRIORITY_MEDIUM, NULL);
-
-  /*************************** ACCELEROMETER
-   * ***************************************/
-  // xTaskCreate(action_on_orientation, "Performing_Action", 4096 /
-  // (sizeof(void*)), NULL, PRIORITY_MEDIUM, NULL);
-  /*************************************************************************************/
+  xTaskCreate(action_on_orientation, "Performing_Action",
+              4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
 
   /***************** MP3 DECODER***************************/
   // mp3_init();
@@ -82,51 +81,31 @@ int main(void) {
   return 0;
 }
 
-static void RGB_frame(void) {
+static void RGB_frame(void *params) {
   gpio_init();
+  // gpio_init();
   while (1) {
     maze_one_frame();
+
+    vTaskDelay(1);
   }
-  delay__ms(50);
+  // delay__ms(50);
 }
 
-static void game_start_display(void *params) {
-  gpio_init();
+void RGB_task_2(void *params) {
+
   while (1) {
-    game_start_display_frame();
-  }
-  delay__ms(50);
-}
 
-void play_the_game(void *params) {
-
-  while (true) {
-    if (xSemaphoreTake(switch_press_indication, 1000)) {
-      RGB_frame();
-      vTaskDelay(250);
-    }
+    jerry_image(row_count, col_count);
+    vTaskDelay(1);
   }
 }
 
 void RGB_task(void *params) {
   while (1) {
-
-    tom_image_2(row_count, col_count);
-
-    // jerry_image(row_count, col_count);
-  }
-}
-
-static void switch_game_start_maze_display_task(void *params) {
-  gpio_s change_display_switch_press = {1, 15};
-
-  while (true) {
-    // Binary Semaphore is set when switch is pressed
-    if (gpio__get(change_display_switch_press)) {
-      xSemaphoreGive(switch_press_indication);
-
-      vTaskDelay(500);
-    }
+    update_display();
+    jerry_check = true;
+    vTaskDelay(5);
   }
 }
 
@@ -138,11 +117,14 @@ void action_on_orientation(void *p) {
 
   while (1) {
     value = acceleration_get_data();
+
     switch (value) {
     case Landscape_LEFT:
+
       left_movement();
       break;
     case Landscape_RIGHT:
+
       right_movement();
       break;
     case Back_Orientation:

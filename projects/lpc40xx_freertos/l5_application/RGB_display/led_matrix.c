@@ -3,6 +3,7 @@
 #include "ff.h"
 #include "gpio.h"
 
+bool jerry_check = false;
 uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH];
 RGB_gpio RGB = {{2, 0}, {2, 1}, {2, 2},  {2, 5},  {2, 4},  {0, 15}, {2, 7},
                 {2, 8}, {2, 9}, {0, 16}, {1, 23}, {1, 20}, {1, 28}};
@@ -341,7 +342,7 @@ void data_clock_in(uint8_t row) {
 
   for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
 
-    clear_display();
+    // clear_display();
 
     ((display_matrix[row][col] >> 0) & 0x1) ? gpio__set(RGB.R1)
                                             : gpio__reset(RGB.R1);
@@ -394,163 +395,16 @@ void clear_pixel(int8_t row, int8_t col) {
 
 void update_display(void) {
   for (uint8_t row = 0; row < LEDMATRIX_HALF_HEIGHT; row++) {
-
-    select_row(row);
-    disable_display();    // gpio__set(OE);
-    disable_latch_data(); // gpio__reset(LAT);
-    data_clock_in(row);
-    enable_latch_data(); // gpio__set(LAT);
-    enable_display();    // gpio__reset(OE);
-    delay__us(150);      // Change Brightness
     disable_display();
+    disable_latch_data();
+    select_row(row);
+    data_clock_in(row);
+    enable_latch_data();
+    enable_display();
+    delay__us(150);
+    // disable_display();
   }
-}
-
-void display_rectangle_pink(void) {
-  for (uint8_t x = 2; x < 12; x++) {
-    for (uint8_t y = 2; y < 13; y++) {
-      set_pixel(x, y, PINK);
-      update_display();
-    }
-  }
-}
-
-void display_rectangle_red(void) {
-  for (uint8_t x = 24; x < 32; x++) {
-    for (uint8_t y = 29; y < 54; y++) {
-      set_pixel(x, y, RED);
-      update_display();
-    }
-  }
-}
-
-void display_moving_image(uint8_t x, uint8_t y) {
-  for (x = 2; x < 23; x++) {
-    for (y = 29; y < 54; y++) {
-      if (x == 22) {
-        clear_pixel(22, y);
-        update_display();
-      } else if (y == 53) {
-        clear_pixel(x, 53);
-        update_display();
-      } else {
-        set_pixel(x, y, GREEN);
-        clear_pixel(x - 1, y - 1);
-        update_display();
-      }
-    }
-  }
-  clear_pixel(x, y);
-  update_display();
-}
-
-void move_rectangle(void) {
-  for (uint8_t x = 5; x < 30; x++) {
-    for (uint8_t y = 29; y < 54; y++) {
-      set_pixel(x, y, GREEN);
-
-      set_pixel(x + 3, y, GREEN);
-      clear_pixel(x - 1, y - 1);
-      set_pixel(x, y + 3, BLUE);
-      clear_pixel(x - 1, y - 1);
-      set_pixel(x + 3, y + 3, PINK);
-      clear_pixel(x - 1, y - 1);
-
-      update_display();
-    }
-  }
-}
-
-void display_maze(void) {
-  for (uint8_t x = 0; x < LEDMATRIX_HEIGHT; x++) {
-    for (uint8_t y = 0; y < LEDMATRIX_WIDTH; y++) {
-      if ((x < 4)) {
-        set_pixel(x, y, GREEN);
-
-        set_pixel((LEDMATRIX_HEIGHT - 1) - x, y, GREEN);
-        update_display();
-      } else if ((x > 7) && (y < 5)) {
-        set_pixel(x, y, RED);
-        set_pixel(x + 7, (LEDMATRIX_WIDTH - 1) - y, RED);
-        update_display();
-      } else if ((x > 3) && (y < 50) && (y >= 40) &&
-                 (x < LEDMATRIX_HEIGHT - 10)) {
-        set_pixel(x, y, RED);
-
-        update_display();
-      } else if ((x > 7) && (x < 15) && (y >= 13) && (y < 16)) {
-        set_pixel(x, y, RED);
-
-        update_display();
-      }
-    }
-  }
-}
-
-void display_image(void) {
-  uint8_t i = 19;
-  set_pixel(i, 15, PINK);
-  set_pixel(i, 14, PINK);
-  set_pixel(i, 16, PINK);
-  set_pixel(i - 1, 14, PINK);
-  set_pixel(i + 1, 14, PINK);
-
-  update_display();
-}
-
-void game_frame(void) {
-  for (uint8_t x = 0; x < LEDMATRIX_HEIGHT; x++) {
-    for (uint8_t y = 0; y < LEDMATRIX_WIDTH; y++) {
-      if (x < 2) {
-        set_pixel(x, y, PINK);
-        update_display();
-      } else if (x >= 30) {
-        set_pixel(x, y, PINK);
-        update_display();
-      } else if (y < 2) {
-        set_pixel(x, y, PINK);
-        update_display();
-      } else if (y >= 62) {
-        set_pixel(x, y, PINK);
-        update_display();
-      } else if (x > 1 && x < 24 && y > 1 && y < 15) {
-        set_pixel(x, y, CYAN);
-        update_display();
-      } else if ((x > 1 && x < 6 && y > 14 && y < 50) || (y >= 55 && x < 6)) {
-        set_pixel(x, y, CYAN);
-        update_display();
-      } else {
-        set_pixel(x, y, BLACK);
-        update_display();
-      }
-    }
-  }
-}
-void display_rectangle_cyan(void) {
-  for (uint8_t x = 10; x < 20; x++) {
-    for (uint8_t y = 20; y < 50; y++) {
-      set_pixel(x, y, CYAN);
-      update_display();
-    }
-  }
-}
-
-void display_rectangle_cyan_small(void) {
-  for (uint8_t x = 24; x < 30; x++) {
-    for (uint8_t y = 20; y < 50; y++) {
-      set_pixel(x, y, GREEN);
-      update_display();
-    }
-  }
-}
-
-void display_rectangle_cyan_big(void) {
-  for (uint8_t x = 10; x < 30; x++) {
-    for (uint8_t y = 55; y < 62; y++) {
-      set_pixel(x, y, YELLOW);
-      update_display();
-    }
-  }
+  disable_display();
 }
 
 void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
@@ -562,40 +416,6 @@ void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
       update_display();
     }
   }
-}
-
-void display_moving_point(uint8_t x, uint8_t y, color_t color) {
-  // for (uint8_t i = x; i <= x + 2; i++) {
-  for (uint8_t j = y; j <= y + 50; j++) {
-    set_pixel(x, j, color);
-    set_pixel(x + 1, j, color);
-    update_display();
-    clear_pixel(x, j);
-    clear_pixel(x + 1, j);
-    update_display();
-    vTaskDelay(10);
-  }
-  // }
-}
-
-void display_up_arrow(void) {
-  set_pixel(26, 2, RED);
-
-  set_pixel(25, 4, RED);
-
-  set_pixel(26, 3, RED);
-
-  set_pixel(27, 4, RED);
-  set_pixel(26, 4, RED);
-  set_pixel(26, 5, RED);
-  set_pixel(27, 2, RED);
-  set_pixel(27, 3, RED);
-  set_pixel(28, 4, RED);
-  set_pixel(27, 5, RED);
-
-  update_display();
-  clear_pixel(26, 2);
-  clear_pixel(25, 4);
 }
 
 void display_maze_frame1(void) {
@@ -634,14 +454,15 @@ void maze_one_frame(void) {
       }
     }
     row_counter++;
-    update_display();
+    // update_display();
 
   }
 
   else {
     row_counter = 0;
+    // update_display();
   }
-  update_display();
+  vTaskDelay(1);
 }
 
 void tom_image(uint8_t x, uint8_t y) {
@@ -674,19 +495,46 @@ void tom_image(uint8_t x, uint8_t y) {
   }
 }
 
+void tom_image_2(uint8_t x, uint8_t y) {
+
+  set_pixel(x, y, BLUE);
+
+  set_pixel(x + 1, y, RED);
+
+  set_pixel(x + 2, y, BLUE);
+
+  set_pixel(x + 1, y + 1, BLUE);
+
+  set_pixel(x + 1, y - 1, BLUE);
+
+  update_display();
+  tom_image_2_clear(x, y);
+}
+
 void jerry_image(uint8_t x, uint8_t y) {
+  clear_display();
   set_pixel(x, y, YELLOW);
   set_pixel(x - 2, y, YELLOW);
   set_pixel(x - 1, y + 1, YELLOW);
-  update_display();
-  // delay__us(150);
-  jerry_image_clear(x, y);
 }
 
 void jerry_image_clear(uint8_t x, uint8_t y) {
+
   clear_pixel(x, y);
   clear_pixel(x - 2, y);
   clear_pixel(x - 1, y + 1);
+}
+
+void tom_image_2_clear(uint8_t x, uint8_t y) {
+  clear_pixel(x, y);
+  update_display();
+  clear_pixel(x + 1, y);
+  update_display();
+  clear_pixel(x + 2, y);
+  update_display();
+  clear_pixel(x + 1, y + 1);
+  update_display();
+  clear_pixel(x + 1, y - 1);
   update_display();
 }
 
@@ -718,28 +566,6 @@ void tom_clear_image(uint8_t x, uint8_t y) {
   } else {
     clear_display();
   }
-}
-
-void tom_image_2(uint8_t x, uint8_t y) {
-  set_pixel(x, y, BLUE);
-  set_pixel(x + 1, y, RED);
-  set_pixel(x + 2, y, BLUE);
-  set_pixel(x + 1, y + 1, BLUE);
-  set_pixel(x + 1, y - 1, BLUE);
-  update_display();
-  tom_image_2_clear(x, y);
-}
-void tom_image_2_clear(uint8_t x, uint8_t y) {
-  clear_pixel(x, y);
-  update_display();
-  clear_pixel(x + 1, y);
-  update_display();
-  clear_pixel(x + 2, y);
-  update_display();
-  clear_pixel(x + 1, y + 1);
-  update_display();
-  clear_pixel(x + 1, y - 1);
-  update_display();
 }
 
 uint8_t game_start_row_counter = 0;
