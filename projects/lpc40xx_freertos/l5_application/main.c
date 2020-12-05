@@ -59,7 +59,8 @@ int main(void) {
   // mp3_mutex = xSemaphoreCreateMutex();
   // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
   // clear_display();
-  xTaskCreate(RGB_frame, "RGB_frame", 4096, NULL, PRIORITY_MEDIUM, &frame);
+  xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
+              PRIORITY_MEDIUM, &frame);
   // xTaskCreate(RGB_task, "RGB_task", 4096, NULL, PRIORITY_HIGH, NULL);
 
   // xTaskCreate(RGB_frame, "RGB_frame", 4096 / (sizeof(void *)), NULL,
@@ -67,8 +68,6 @@ int main(void) {
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
   xTaskCreate(RGB_task_2, "RGB_task_2", 4096 / (sizeof(void *)), NULL,
-              PRIORITY_MEDIUM, NULL);
-  xTaskCreate(RGB_jerry_clear, "RGB_jerry_clear", 4096 / (sizeof(void *)), NULL,
               PRIORITY_MEDIUM, NULL);
 
   // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void
@@ -102,57 +101,17 @@ static void RGB_frame(void *params) {
 
 void RGB_task(void *params) {
   while (1) {
-    // clear_display();
     update_display();
     jerry_check = true;
-    // vTaskSuspend(frame);
-    // vTaskDelay(10);
-    // // tom_image(row_count, col_count);
-    // vTaskDelay(5);
-    // tom_clear_image(row_count, col_count);
-    // tom_image_1(3, 4);
-    // jerry_image(row_count, col_count);
-
-    // vTaskDelay(10);
-    // vTaskDelay(1);
-    // for (uint8_t x = 6; x < 13; x++) {
-    //   for (uint8_t y = 15; y < 55; y++) {
-    //     tom_image_2(x, y);
-    //   }
-    // }
     vTaskDelay(5);
-
-    // tom_image_2_clear(row_count, col_count);
   }
 }
 
 void RGB_task_2(void *params) {
 
   while (1) {
-    //
-    // clear_display();
-    // update_display();
-    // if (xSemaphoreTake(rgb_owner, portMAX_DELAY)) {
-
     jerry_image(row_count, col_count);
     vTaskDelay(1);
-    // jerry_image_clear(row_count, col_count);
-    // xSemaphoreGive(rgb_owner);
-  }
-}
-void RGB_jerry_clear(void *params) {
-
-  while (1) {
-    //
-    // clear_display();
-    // update_display();
-    // if (xSemaphoreTake(rgb_owner, portMAX_DELAY)) {
-    if (jerry_check) {
-      jerry_image_clear(row_count, col_count);
-      vTaskDelay(1);
-      // xSemaphoreGive(rgb_owner);
-      jerry_check = false;
-    }
   }
 }
 

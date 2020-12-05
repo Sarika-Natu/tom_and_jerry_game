@@ -52,33 +52,17 @@ void enable_display(void);
 void enable_latch_data(void);
 void disable_latch_data(void);
 void data_clock_in(uint8_t row);
-void selectMux(uint8_t row);
 
 void set_pixel(int8_t x, int8_t y, color_t color);
 void clear_pixel(int8_t x, int8_t y);
 void clear_display(void);
-void display_rectangle_pink(void);
-void display_rectangle_red(void);
-void display_moving_image(uint8_t x, uint8_t y);
-void move_rectangle(void);
 void display_maze(void);
 void display_image(void);
-void display_acc_value(uint8_t x);
 void game_frame(void);
-void display_rectangle_cyan(void);
-void display_rectangle_cyan_small(void);
-void display_rectangle_cyan_big(void);
 void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
                              uint8_t width_y, color_t color);
-
-void display_moving_point(uint8_t x, uint8_t y, color_t color);
-
-void display_up_arrow(void);
 void display_maze_frame1(void);
 void maze_one_frame(void);
-void tom_image(uint8_t x, uint8_t y);
-void tom_clear_image(uint8_t x, uint8_t y);
-void tom_image_1(uint8_t x, uint8_t y);
 void jerry_image(uint8_t x, uint8_t y);
 void jerry_image_clear(uint8_t x, uint8_t y);
 void tom_image_2_clear(uint8_t x, uint8_t y);

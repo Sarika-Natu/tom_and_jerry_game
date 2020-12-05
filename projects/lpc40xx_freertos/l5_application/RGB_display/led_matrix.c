@@ -178,8 +178,6 @@ void data_clock_in(uint8_t row) {
 
   for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
 
-    clear_display();
-
     ((display_matrix[row][col] >> 0) & 0x1) ? gpio__set(RGB.R1)
                                             : gpio__reset(RGB.R1);
     ((display_matrix[row][col] >> 1) & 0x1) ? gpio__set(RGB.G1)
@@ -195,6 +193,8 @@ void data_clock_in(uint8_t row) {
 
     gpio__set(RGB.CLK);
     gpio__reset(RGB.CLK);
+    enable_latch_data();
+    disable_latch_data();
   }
 }
 
@@ -206,11 +206,11 @@ void set_pixel(int8_t row, int8_t col, color_t color) {
     return;
 
   if (row >= LEDMATRIX_HALF_HEIGHT) {
-    // fprintf(stderr, "row %d col %d\n", row, col);
+
     display_matrix[row % LEDMATRIX_HALF_HEIGHT][col] |= (color << 4);
-    // fprintf(stderr, "row %d col %d\n", row, col);
+
   } else {
-    // fprintf(stderr, "row %d col %d\n", row, col);
+
     display_matrix[row][col] |= (color);
   }
 }
@@ -232,13 +232,13 @@ void clear_pixel(int8_t row, int8_t col) {
 void update_display(void) {
   for (uint8_t row = 0; row < LEDMATRIX_HALF_HEIGHT; row++) {
 
+    disable_display();
+    disable_latch_data();
     select_row(row);
-    disable_display();    // gpio__set(OE);
-    disable_latch_data(); // gpio__reset(LAT);
     data_clock_in(row);
-    enable_latch_data(); // gpio__set(LAT);
-    enable_display();    // gpio__reset(OE);
-    delay__us(150);      // Change Brightness
+    enable_latch_data();
+    enable_display();
+    delay__us(150);
     disable_display();
   }
 }
@@ -277,58 +277,25 @@ void maze_one_frame(void) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
       if ((maze_one_lookup_table[row_counter][col]) == 4) {
         set_pixel(row_counter, col, BLUE);
-        // update_display();
+
       } else if ((maze_one_lookup_table[row_counter][col]) == 2) {
         set_pixel(row_counter, col, GREEN);
-        // update_display();
+
       } else if ((maze_one_lookup_table[row_counter][col]) == 5) {
         set_pixel(row_counter, col, PINK);
-        // update_display();
+
       } else if ((maze_one_lookup_table[row_counter][col]) == 3) {
         set_pixel(row_counter, col, YELLOW);
-        // update_display();
       }
     }
     row_counter++;
-    // update_display();
 
   }
 
   else {
     row_counter = 0;
-    // update_display();
   }
   vTaskDelay(1);
-}
-
-void tom_image(uint8_t x, uint8_t y) {
-  if (maze_one_lookup_table[x][y] != 3 && maze_one_lookup_table[x][y] != 4 &&
-      maze_one_lookup_table[x][y] != 5) {
-    set_pixel(x, y, BLUE);
-    set_pixel(x + 1, y, BLUE);
-    set_pixel(x + 2, y, BLUE);
-    set_pixel(x - 1, y + 1, BLUE);
-    set_pixel(x + 1, y + 1, BLUE);
-    set_pixel(x + 2, y + 1, BLUE);
-    set_pixel(x + 3, y + 1, BLUE);
-    set_pixel(x - 1, y + 2, BLUE);
-    set_pixel(x, y + 2, BLUE);
-    set_pixel(x + 1, y + 2, BLUE);
-    set_pixel(x + 3, y + 2, BLUE);
-    set_pixel(x - 1, y + 3, BLUE);
-    set_pixel(x + 1, y + 3, BLUE);
-    set_pixel(x + 2, y + 3, BLUE);
-    set_pixel(x + 3, y + 3, BLUE);
-    set_pixel(x, y + 4, BLUE);
-    set_pixel(x + 1, y + 4, BLUE);
-    set_pixel(x + 2, y + 4, BLUE);
-    set_pixel(x, y + 1, YELLOW);
-    set_pixel(x, y + 3, YELLOW);
-    set_pixel(x + 2, y + 2, RED);
-    update_display();
-  } else {
-    clear_display();
-  }
 }
 
 void tom_image_2(uint8_t x, uint8_t y) {
@@ -348,14 +315,14 @@ void tom_image_2(uint8_t x, uint8_t y) {
 }
 
 void jerry_image(uint8_t x, uint8_t y) {
-  // jerry_image_clear(x, y);
-  clear_display();
+
   set_pixel(x, y, YELLOW);
   set_pixel(x - 2, y, YELLOW);
   set_pixel(x - 1, y + 1, YELLOW);
-  // update_display();
-  // delay__us(150);
-  // jerry_image_clear(x, y);
+  delay__ms(1);
+  clear_pixel(x, y);
+  clear_pixel(x - 2, y);
+  clear_pixel(x - 1, y + 1);
 }
 
 void jerry_image_clear(uint8_t x, uint8_t y) {
@@ -376,34 +343,4 @@ void tom_image_2_clear(uint8_t x, uint8_t y) {
   update_display();
   clear_pixel(x + 1, y - 1);
   update_display();
-}
-
-void tom_clear_image(uint8_t x, uint8_t y) {
-  if (maze_one_lookup_table[x][y] != 3 && maze_one_lookup_table[x][y] != 4 &&
-      maze_one_lookup_table[x][y] != 5) {
-    clear_pixel(x, y);
-    clear_pixel(x + 1, y);
-    clear_pixel(x + 2, y);
-    clear_pixel(x - 1, y + 1);
-    clear_pixel(x + 1, y + 1);
-    clear_pixel(x + 2, y + 1);
-    clear_pixel(x + 3, y + 1);
-    clear_pixel(x - 1, y + 2);
-    clear_pixel(x, y + 2);
-    clear_pixel(x + 1, y + 2);
-    clear_pixel(x + 3, y + 2);
-    clear_pixel(x - 1, y + 3);
-    clear_pixel(x + 1, y + 3);
-    clear_pixel(x + 2, y + 3);
-    clear_pixel(x + 3, y + 3);
-    clear_pixel(x, y + 4);
-    clear_pixel(x + 1, y + 4);
-    clear_pixel(x + 2, y + 4);
-    clear_pixel(x, y + 3);
-    clear_pixel(x + 2, y + 2);
-    clear_pixel(x, y + 1);
-    update_display();
-  } else {
-    clear_display();
-  }
 }
