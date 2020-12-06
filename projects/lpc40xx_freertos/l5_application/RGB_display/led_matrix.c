@@ -259,8 +259,8 @@ void tom_move_on_maze(uint8_t x, uint8_t y) {
   if (command_left) {
     if (maze_one_lookup_table[x + 1][y + 1] == 5 ||
         maze_one_lookup_table[x + 1][y + 1] == 4 ||
-        maze_one_lookup_table[x + 2][y + 2] == 5 ||
-        maze_one_lookup_table[x + 2][y + 2] == 4) {
+        maze_one_lookup_table[x + 3][y + 1] == 5 ||
+        maze_one_lookup_table[x + 3][y + 1] == 4) {
       left_move = false;
     } else if (maze_one_lookup_table[x + 2][y] == 5 ||
                maze_one_lookup_table[x + 2][y] == 4) {
