@@ -1,8 +1,6 @@
-#include <stdio.h>
-
 #include "FreeRTOS.h"
+#include "game_logic.h"
 #include "task.h"
-
 //#include "acceleration.h"
 #include "board_io.h"
 #include "common_macros.h"
@@ -27,9 +25,6 @@ bool command_down = true;
 bool command_left = true;
 bool command_right = true;
 
-static SemaphoreHandle_t mp3_mutex = NULL;
-static QueueHandle_t mp3_queue = NULL;
-
 void action_on_orientation(void *p);
 SemaphoreHandle_t movement_counter = NULL;
 SemaphoreHandle_t rgb_owner = NULL;
@@ -43,6 +38,20 @@ uint8_t row_count = 0;
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
 
+//#define TEST
+SemaphoreHandle_t mp3_mutex = NULL;
+SemaphoreHandle_t default_sound = NULL;
+SemaphoreHandle_t game_sound = NULL;
+SemaphoreHandle_t catchsuccess_sound = NULL;
+SemaphoreHandle_t catchfail_sound = NULL;
+SemaphoreHandle_t score_sound = NULL;
+QueueHandle_t mp3_queue = NULL;
+
+SemaphoreHandle_t button_pressed_signal = NULL;
+SemaphoreHandle_t change_game_state = NULL;
+
+void game_task(void *p);
+void button_task(void *p);
 void read_song(void *p);
 void play_song(void *p);
 void RGB_clear(void *p);
@@ -53,14 +62,18 @@ void tom_motion_update(void *params);
 int main(void) {
 
   movement_counter = xSemaphoreCreateMutex();
+  mp3_mutex = xSemaphoreCreateMutex();
+  default_sound = xSemaphoreCreateBinary();
+  game_sound = xSemaphoreCreateBinary();
+  catchsuccess_sound = xSemaphoreCreateBinary();
+  catchfail_sound = xSemaphoreCreateBinary();
+  score_sound = xSemaphoreCreateBinary();
+  mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   gpio_init();
-
   clear_display();
-
   acceleration__init();
-  // mp3_mutex = xSemaphoreCreateMutex();
-  // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
+  setup_button_isr();
 
   xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
               PRIORITY_MEDIUM, NULL);
@@ -75,14 +88,18 @@ int main(void) {
   xTaskCreate(action_on_orientation, "Performing_Action",
               4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
 
+  /***************** Game Logic ***************************/
+  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void
+  // *)NULL,PRIORITY_LOW, NULL); xTaskCreate(button_task, "button_task", (512U *
+  // 4) / sizeof(void *),(void *)NULL, PRIORITY_LOW, NULL);
+
   /***************** MP3 DECODER***************************/
-  // mp3_init();
-  // mp3_mutex = xSemaphoreCreateMutex();
-  // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
-  // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void
-  // *),(void*)NULL, PRIORITY_LOW, NULL); xTaskCreate(play_song, "play_song",
-  // (512U* 4) / sizeof(void*), (void *)NULL, PRIORITY_HIGH, NULL);
-  /***********************************************************************************/
+  mp3_init();
+  xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
+              (void *)NULL, PRIORITY_LOW, NULL);
+  xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
+              PRIORITY_LOW, NULL);
+  /*********************************************************/
   vTaskStartScheduler();
 
   return 0;
@@ -210,58 +227,58 @@ void up_movement(void) {
 /*******************************************************************/
 /*                       MP3 DECODER                               */
 /*******************************************************************/
-void read_song(void *p) {
-  const char *filename = "RangDeBasanti.mp3";
-  static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
-  FRESULT result;
-  FIL file;
+// void read_song(void *p) {
+//   const char *filename = "RangDeBasanti.mp3";
+//   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
+//   FRESULT result;
+//   FIL file;
 
-  result = f_open(&file, filename, FA_OPEN_EXISTING | FA_READ);
-  UINT bytes_read;
-  while (1) {
-    xSemaphoreTake(mp3_mutex, portMAX_DELAY);
+//   result = f_open(&file, filename, FA_OPEN_EXISTING | FA_READ);
+//   UINT bytes_read;
+//   while (1) {
+//     xSemaphoreTake(mp3_mutex, portMAX_DELAY);
 
-    result =
-        f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
-    if (0 != result) {
-      printf("Result of %s is %i\n", filename, result);
-    }
+//     result =
+//         f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
+//     if (0 != result) {
+//       printf("Result of %s is %i\n", filename, result);
+//     }
 
-    xSemaphoreGive(mp3_mutex);
-    xQueueSend(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
-  }
-}
+//     xSemaphoreGive(mp3_mutex);
+//     xQueueSend(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
+//   }
+// }
 
-void play_song(void *p) {
-  static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
-  static uint8_t current_count = 0;
-  uint32_t start_index = 0;
-  while (1) {
+// void play_song(void *p) {
+//   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
+//   static uint8_t current_count = 0;
+//   uint32_t start_index = 0;
+//   while (1) {
 
-    if (current_count == 0) {
-      xQueueReceive(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
-    }
-    start_index = (current_count * MAX_BYTES_TX);
+//     if (current_count == 0) {
+//       xQueueReceive(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
+//     }
+//     start_index = (current_count * MAX_BYTES_TX);
 
-    while (!mp3_dreq_get_status()) {
-#ifdef TEST
-      printf("data not requested\n");
-#endif
-      vTaskDelay(2);
-    }
-    if (xSemaphoreTake(mp3_mutex, portMAX_DELAY)) {
+//     while (!mp3_dreq_get_status()) {
+// #ifdef TEST
+//       printf("data not requested\n");
+// #endif
+//       vTaskDelay(2);
+//     }
+//     if (xSemaphoreTake(mp3_mutex, portMAX_DELAY)) {
 
-      send_bytes_to_decoder(start_index, &bytes_to_read[0]);
-      xSemaphoreGive(mp3_mutex);
-      if (current_count == (READ_BYTES_FROM_FILE / MAX_BYTES_TX) - 1) {
-        current_count = 0;
-      } else {
-        current_count += 1;
-#ifdef TEST
-        printf("count = %d\n", current_count);
-#endif
-      }
-    }
-  }
-}
+//       send_bytes_to_decoder(start_index, &bytes_to_read[0]);
+//       xSemaphoreGive(mp3_mutex);
+//       if (current_count == (READ_BYTES_FROM_FILE / MAX_BYTES_TX) - 1) {
+//         current_count = 0;
+//       } else {
+//         current_count += 1;
+// #ifdef TEST
+//         printf("count = %d\n", current_count);
+// #endif
+//       }
+//     }
+//   }
+// }
 /*******************************************************************/
