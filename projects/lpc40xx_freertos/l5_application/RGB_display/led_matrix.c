@@ -242,6 +242,23 @@ void tom_image(uint8_t x, uint8_t y) {
   clear_pixel(x + 3, y + 2);
 }
 
+/*  red 3 x 3 
+    *
+  * * *
+    * 
+*/
+
+
+/*  yellow 3 x 3
+    *
+    * *
+    * 
+*/
+
+
+
+
+
 void tom_move_on_maze(uint8_t x, uint8_t y) {
 
   if (command_up) {
