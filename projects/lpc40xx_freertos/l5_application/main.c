@@ -22,6 +22,11 @@
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
 
+bool command_up = true;
+bool command_down = true;
+bool command_left = true;
+bool command_right = true;
+
 static SemaphoreHandle_t mp3_mutex = NULL;
 static QueueHandle_t mp3_queue = NULL;
 
@@ -37,19 +42,21 @@ uint8_t row_count = 0;
 
 static void RGB_task(void *params);
 static void RGB_frame(void *params);
+
 void read_song(void *p);
 void play_song(void *p);
 void RGB_clear(void *p);
 
 void RGB_task_2(void *params);
-
-bool jerry_check;
+void tom_motion_update(void *params);
 
 int main(void) {
-  // mp3_init();
+
   movement_counter = xSemaphoreCreateMutex();
 
   gpio_init();
+
+  clear_display();
 
   acceleration__init();
   // mp3_mutex = xSemaphoreCreateMutex();
@@ -60,22 +67,23 @@ int main(void) {
 
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
-  xTaskCreate(RGB_task_2, "RGB_task_2", 4096 / (sizeof(void *)), NULL,
+  xTaskCreate(RGB_task_2, "Jerry_Move", 4096 / (sizeof(void *)), NULL,
               PRIORITY_MEDIUM, NULL);
 
-  // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void
-  // *), (void
-  // *)NULL, PRIORITY_LOW, NULL);
-  // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void*),
-  // (void
-  // *)NULL, PRIORITY_HIGH, NULL);
-
+  xTaskCreate(tom_motion_update, "tom_motion_update", 4096 / (sizeof(void *)),
+              NULL, PRIORITY_MEDIUM, NULL);
   xTaskCreate(action_on_orientation, "Performing_Action",
               4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
 
-  puts("Starting RTOS");
-  vTaskStartScheduler(); // This function never returns unless RTOS
-                         // scheduler runs out of memory and fails
+  /***************** MP3 DECODER***************************/
+  // mp3_init();
+  // mp3_mutex = xSemaphoreCreateMutex();
+  // mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
+  // xTaskCreate(read_song, "read_song", (512U * 8) / sizeof(void
+  // *),(void*)NULL, PRIORITY_LOW, NULL); xTaskCreate(play_song, "play_song",
+  // (512U* 4) / sizeof(void*), (void *)NULL, PRIORITY_HIGH, NULL);
+  /***********************************************************************************/
+  vTaskStartScheduler();
 
   return 0;
 }
@@ -98,12 +106,110 @@ void RGB_task(void *params) {
 void RGB_task_2(void *params) {
 
   while (1) {
-    // jerry_image(row_count, col_count);
-    jerry_move_on_maze(row_count, col_count);
+
+    tom_image(row_count, col_count);
     vTaskDelay(1);
   }
 }
 
+void tom_motion_update(void *params) {
+
+  while (1) {
+    // jerry_image(row_count, col_count);
+    tom_move_on_maze(row_count, col_count);
+
+    vTaskDelay(1);
+  }
+}
+
+/*******************************************************************/
+/*                       ACCELEROMETER                             */
+/*******************************************************************/
+void action_on_orientation(void *p) {
+  orientation_e value;
+
+  while (1) {
+    value = acceleration_get_data();
+
+    switch (value) {
+    case Landscape_LEFT:
+      command_left = true;
+      if (left_move) {
+        left_movement();
+      }
+      left_move = true;
+      break;
+    case Landscape_RIGHT:
+      command_right = true;
+      if (right_move) {
+        right_movement();
+      }
+      right_move = true;
+      break;
+    case Back_Orientation:
+
+      break;
+    case Front_Orientation:
+
+      break;
+    case Portrait_DOWN:
+      command_down = true;
+      if (down_move) {
+        down_movement();
+      }
+      down_move = true;
+      break;
+    default:
+      command_up = true;
+      if (up_move) {
+        up_movement();
+      }
+      up_move = true;
+      break;
+    }
+    vTaskDelay(100);
+  }
+}
+
+void left_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+
+    col_count--;
+  }
+
+  xSemaphoreGive(movement_counter);
+}
+
+void right_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+
+    col_count++;
+  }
+
+  xSemaphoreGive(movement_counter);
+}
+void down_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+
+    row_count++;
+  }
+
+  xSemaphoreGive(movement_counter);
+}
+
+void up_movement(void) {
+  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
+
+    row_count--;
+  }
+
+  xSemaphoreGive(movement_counter);
+}
+/*******************************************************************/
+
+/*******************************************************************/
+/*                       MP3 DECODER                               */
+/*******************************************************************/
 void read_song(void *p) {
   const char *filename = "RangDeBasanti.mp3";
   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
@@ -158,70 +264,4 @@ void play_song(void *p) {
     }
   }
 }
-
-void action_on_orientation(void *p) {
-  orientation_e value;
-
-  while (1) {
-    value = acceleration_get_data();
-
-    switch (value) {
-    case Landscape_LEFT:
-
-      left_movement();
-      break;
-    case Landscape_RIGHT:
-
-      right_movement();
-      break;
-    case Back_Orientation:
-
-      break;
-    case Front_Orientation:
-
-      break;
-    case Portrait_DOWN:
-      down_movement();
-      break;
-    default:
-      up_movement();
-      break;
-    }
-    vTaskDelay(100);
-  }
-}
-
-void left_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    col_count--;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-
-void right_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    col_count++;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-void down_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    row_count--;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-
-void up_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    row_count++;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
+/*******************************************************************/

@@ -14,6 +14,16 @@
 #define LEDMATRIX_HALF_HEIGHT 16
 #define LEDMATRIX_HALF_WIDTH 32
 
+extern bool right_move;
+extern bool left_move;
+extern bool up_move;
+extern bool down_move;
+
+extern bool command_up;
+extern bool command_down;
+extern bool command_left;
+extern bool command_right;
+
 typedef enum {
   BLACK = 0,
   RED = 1,
@@ -63,8 +73,10 @@ void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
                              uint8_t width_y, color_t color);
 void display_maze_frame1(void);
 void maze_one_frame(void);
-void jerry_image(uint8_t x, uint8_t y);
+void jerry_image(void);
 void jerry_image_clear(uint8_t x, uint8_t y);
+void game_start_display_frame(void);
 void tom_image_2_clear(uint8_t x, uint8_t y);
 void tom_image_2(uint8_t x, uint8_t y);
-void jerry_move_on_maze(uint8_t x, uint8_t y);
+void tom_image(uint8_t x, uint8_t y);
+void tom_move_on_maze(uint8_t x, uint8_t y);

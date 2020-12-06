@@ -2,13 +2,16 @@
 #include "delay.h"
 #include "ff.h"
 #include "gpio.h"
+#include "matrix_look_up_table.h"
 
-
-extern bool jerry_check;
-uint8_t hold_x, hold_y;
 uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH];
 RGB_gpio RGB = {{2, 0}, {2, 1}, {2, 2},  {2, 5},  {2, 4},  {0, 15}, {2, 7},
                 {2, 8}, {2, 9}, {0, 16}, {1, 23}, {1, 20}, {1, 28}};
+
+bool right_move;
+bool left_move;
+bool up_move;
+bool down_move;
 
 void disable_display(void) { gpio__set(RGB.OE); }
 
@@ -17,105 +20,6 @@ void enable_display(void) { gpio__reset(RGB.OE); }
 void enable_latch_data(void) { gpio__set(RGB.STB); }
 
 void disable_latch_data(void) { gpio__reset(RGB.STB); }
-
-uint8_t maze_one_lookup_table[LEDMATRIX_HEIGHT][LEDMATRIX_WIDTH] = {
-    {0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
-     0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
-     0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0, 3, 0, 0,
-     0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 3, 0, 3, 3, 3, 3, 3, 3, 3,
-     3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 5, 5},
-    {5, 5, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2,
-     2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
-     3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 5, 5},
-    {5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-     4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0,
-     0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0,
-     0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 5, 5},
-    {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
-    {5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5},
-};
 
 void clear_display(void) {
   gpio__reset(RGB.R1);
@@ -233,7 +137,6 @@ void clear_pixel(int8_t row, int8_t col) {
 
 void update_display(void) {
   for (uint8_t row = 0; row < LEDMATRIX_HALF_HEIGHT; row++) {
-
     disable_display();
     disable_latch_data();
     select_row(row);
@@ -243,6 +146,7 @@ void update_display(void) {
     delay__us(150);
     disable_display();
   }
+  disable_display();
 }
 
 void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
@@ -273,7 +177,6 @@ void display_maze_frame1(void) {
 uint8_t row_counter = 0;
 
 void maze_one_frame(void) {
-  //  for (uint8_t row = 0; row < LEDMATRIX_HALF_HEIGHT; row++) {
 
   if (row_counter < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
@@ -300,61 +203,88 @@ void maze_one_frame(void) {
   vTaskDelay(1);
 }
 
-void tom_image_2(uint8_t x, uint8_t y) {
+void jerry_image(void) {
 
-  set_pixel(x, y, BLUE);
-
-  set_pixel(x + 1, y, RED);
-
-  set_pixel(x + 2, y, BLUE);
-
-  set_pixel(x + 1, y + 1, BLUE);
-
-  set_pixel(x + 1, y - 1, BLUE);
-
-  update_display();
-  tom_image_2_clear(x, y);
+  for (uint8_t y = 0; y < 64; y++) {
+    for (uint8_t x = 0; x < 32; x++) {
+      if (maze_one_lookup_table[x][y] == 12) {
+        set_pixel(x, y, YELLOW);
+        set_pixel(x - 2, y, YELLOW);
+        set_pixel(x - 1, y + 1, YELLOW);
+        delay__ms(250);
+        clear_pixel(x, y);
+        clear_pixel(x - 2, y);
+        clear_pixel(x - 1, y + 1);
+      }
+    }
+  }
 }
 
-void jerry_image(uint8_t x, uint8_t y) {
+void tom_image(uint8_t x, uint8_t y) {
 
-  set_pixel(x, y, YELLOW);
-  set_pixel(x - 2, y, YELLOW);
-  set_pixel(x - 1, y + 1, YELLOW);
+  clear_display();
+
+  set_pixel(x + 1, y + 2, RED); // top_movement_2
+  set_pixel(x + 2, y + 1, RED); // left_movement_3
+  set_pixel(x + 2, y + 2, RED);
+  set_pixel(x + 2, y + 3, RED); // botton_movement_4
+  set_pixel(x + 3, y + 2, RED); // right_movement_1
+
   delay__ms(1);
-  clear_pixel(x, y);
-  clear_pixel(x - 2, y);
-  clear_pixel(x - 1, y + 1);
+  clear_pixel(x + 1, y + 2);
+  clear_pixel(x + 2, y + 1);
+  clear_pixel(x + 2, y + 2);
+  clear_pixel(x + 2, y + 3);
+  clear_pixel(x + 3, y + 2);
 }
 
-void jerry_image_clear(uint8_t x, uint8_t y) {
+void tom_move_on_maze(uint8_t x, uint8_t y) {
 
-  clear_pixel(x, y);
-  clear_pixel(x - 2, y);
-  clear_pixel(x - 1, y + 1);
-}
+  if (command_up) {
+    if (maze_one_lookup_table[x + 1][y + 3] == 5 ||
+        maze_one_lookup_table[x + 1][y + 3] == 4 ||
+        maze_one_lookup_table[x + 1][y + 1] == 5 ||
+        maze_one_lookup_table[x + 1][y + 1] == 4) {
+      up_move = false;
+    } else if (maze_one_lookup_table[x][y + 2] == 5 ||
+               maze_one_lookup_table[x][y + 2] == 4) {
+      up_move = false;
+    }
+  }
 
-void tom_image_2_clear(uint8_t x, uint8_t y) {
-  clear_pixel(x, y);
-  update_display();
-  clear_pixel(x + 1, y);
-  update_display();
-  clear_pixel(x + 2, y);
-  update_display();
-  clear_pixel(x + 1, y + 1);
-  update_display();
-  clear_pixel(x + 1, y - 1);
-  update_display();
-}
+  if (command_left) {
+    if (maze_one_lookup_table[x + 1][y + 1] == 5 ||
+        maze_one_lookup_table[x + 1][y + 1] == 4 ||
+        maze_one_lookup_table[x + 2][y + 2] == 5 ||
+        maze_one_lookup_table[x + 2][y + 2] == 4) {
+      left_move = false;
+    } else if (maze_one_lookup_table[x + 2][y] == 5 ||
+               maze_one_lookup_table[x + 2][y] == 4) {
+      left_move = false;
+    }
+  }
 
-void jerry_move_on_maze(uint8_t x, uint8_t y) {
-  if (maze_one_lookup_table[x][y] == 4 || maze_one_lookup_table[x][y] == 5) {
-    jerry_check = false;
-    jerry_image(hold_x, hold_y);
-  } else {
-     jerry_check = true;
-    hold_x = x;
-    hold_y = y;
-    jerry_image(hold_x, hold_y);
+  if (command_right) {
+    if (maze_one_lookup_table[x + 1][y + 3] == 5 ||
+        maze_one_lookup_table[x + 1][y + 3] == 4 ||
+        maze_one_lookup_table[x + 3][y + 3] == 5 ||
+        maze_one_lookup_table[x + 3][y + 3] == 4) {
+      right_move = false;
+    } else if (maze_one_lookup_table[x + 2][y + 4] == 5 ||
+               maze_one_lookup_table[x + 2][y + 4] == 4) {
+      right_move = false;
+    }
+  }
+
+  if (command_down) {
+    if (maze_one_lookup_table[x + 3][y + 3] == 5 ||
+        maze_one_lookup_table[x + 3][y + 3] == 4 ||
+        maze_one_lookup_table[x + 3][y + 1] == 5 ||
+        maze_one_lookup_table[x + 3][y + 1] == 4) {
+      down_move = false;
+    } else if (maze_one_lookup_table[x + 4][y + 2] == 5 ||
+               maze_one_lookup_table[x + 4][y + 2] == 4) {
+      down_move = false;
+    }
   }
 }
