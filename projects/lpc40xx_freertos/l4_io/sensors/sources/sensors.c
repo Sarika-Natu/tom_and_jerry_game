@@ -1,6 +1,6 @@
 #include "sensors.h"
 
-#include "acceleration.h"
+#include "game_accelerometer.h"
 
 bool sensors__init(void) {
   bool status = true;
