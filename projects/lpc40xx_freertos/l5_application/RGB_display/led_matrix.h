@@ -24,6 +24,9 @@ extern bool command_down;
 extern bool command_left;
 extern bool command_right;
 
+extern uint8_t col_count;
+extern uint8_t row_count;
+
 typedef enum {
   BLACK = 0,
   RED = 1,
@@ -80,3 +83,4 @@ void tom_image_2_clear(uint8_t x, uint8_t y);
 void tom_image_2(uint8_t x, uint8_t y);
 void tom_image(uint8_t x, uint8_t y);
 void tom_move_on_maze(uint8_t x, uint8_t y);
+void maze_one_frame_one(void);

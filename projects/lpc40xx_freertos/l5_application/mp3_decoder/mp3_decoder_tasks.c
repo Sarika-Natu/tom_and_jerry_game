@@ -2,7 +2,7 @@
 #include "mp3_decoder.h"
 #include "queue.h"
 
-#define TEST
+// #define TEST
 #ifdef TEST
 #include <stdio.h>
 #endif
@@ -129,7 +129,7 @@ void read_song(void *p) {
     result =
         f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
     if (0 != result) {
-      printf("Result of read is %i\n", result);
+      // printf("Result of read is %i\n", result);
     }
 
     xSemaphoreGive(mp3_mutex);
