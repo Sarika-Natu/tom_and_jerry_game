@@ -5,6 +5,7 @@
 #include "board_io.h"
 #include "common_macros.h"
 #include "delay.h"
+#include "display_start_screen.h"
 #include "ff.h"
 #include "game_accelerometer.h"
 #include "gpio.h"
@@ -76,31 +77,33 @@ int main(void) {
   setup_button_isr();
 
   xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
-              PRIORITY_MEDIUM, NULL);
+              PRIORITY_HIGH, NULL);
 
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
-  xTaskCreate(RGB_task_2, "Tom_Move", 4096 / (sizeof(void *)), NULL,
-              PRIORITY_MEDIUM, NULL);
+
+  // xTaskCreate(RGB_task_2, "Tom_Move", 4096 / (sizeof(void *)),
+  // NULL,PRIORITY_MEDIUM, NULL);
 
   // xTaskCreate(tom_motion_update, "tom_motion_update", 4096 / (sizeof(void
   // *)),     NULL, PRIORITY_MEDIUM, NULL);
-  xTaskCreate(action_on_orientation, "Performing_Action",
-              4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
+  // xTaskCreate(action_on_orientation, "Performing_Action",4096 / (sizeof(void
+  // *)), NULL, PRIORITY_MEDIUM, NULL);
 
   /***************** Game Logic ***************************/
-  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void
-  // *), (void
-  // *)NULL,PRIORITY_LOW, NULL); xTaskCreate(button_task,
+  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void
+  // *)NULL,PRIORITY_MEDIUM, NULL);
+  // xTaskCreate(button_task,
   // "button_task", (512U * 4) / sizeof(void *),(void *)NULL,
   // PRIORITY_LOW, NULL);
 
   /***************** MP3 DECODER***************************/
-  mp3_init();
-  xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
-              (void *)NULL, PRIORITY_LOW, NULL);
-  xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
-              PRIORITY_LOW, NULL);
+  // mp3_init();
+  // xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
+  //             (void *)NULL, PRIORITY_LOW, NULL);
+  // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void
+  // *)NULL,
+  //             PRIORITY_LOW, NULL);
   /*********************************************************/
   vTaskStartScheduler();
 
@@ -110,7 +113,8 @@ int main(void) {
 static void RGB_frame(void *params) {
 
   while (1) {
-    maze_one_frame();
+    // maze_one_frame();
+    start_screen_display();
     vTaskDelay(1);
   }
 }

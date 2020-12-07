@@ -1,5 +1,6 @@
 #include "game_logic.h"
 #include "FreeRTOS.h"
+#include "display_start_screen.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
@@ -46,6 +47,7 @@ void game_task(void *p) {
       // Call function for led_matrix START screen here.
       xSemaphoreGive(default_sound);
       if (change_state) {
+        start_screen_display();
         game_screen_state = GAME_ON;
         change_state = false;
       }

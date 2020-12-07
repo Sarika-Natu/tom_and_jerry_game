@@ -73,6 +73,7 @@ void display_rectangle_width(uint8_t x, uint8_t y, uint8_t width_x,
                              uint8_t width_y, color_t color);
 void display_maze_frame1(void);
 void maze_one_frame(void);
+// void start_screen_display(void);
 void jerry_image(void);
 void jerry_image_clear(uint8_t x, uint8_t y);
 void game_start_display_frame(void);
