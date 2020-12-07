@@ -1,6 +1,7 @@
 #include "led_matrix.h"
 #include "delay.h"
 #include "ff.h"
+#include "game_logic.h"
 #include "gpio.h"
 #include "matrix_look_up_table.h"
 
@@ -12,6 +13,7 @@ bool right_move;
 bool left_move;
 bool up_move;
 bool down_move;
+extern struct object_axis jerry;
 
 void disable_display(void) { gpio__set(RGB.OE); }
 
@@ -209,6 +211,8 @@ void jerry_image(void) {
     for (uint8_t y = 0; y < 64; y++) {
       for (uint8_t x = 0; x < 32; x++) {
         if (maze_one_lookup_table[x][y] == counter) {
+          jerry.x = x;
+          jerry.y = y;
           set_pixel(x, y, YELLOW);
           set_pixel(x + 2, y, YELLOW);
           set_pixel(x + 1, y, YELLOW);

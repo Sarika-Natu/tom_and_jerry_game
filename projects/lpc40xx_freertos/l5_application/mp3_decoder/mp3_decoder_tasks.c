@@ -1,8 +1,9 @@
 #include "ff.h"
 #include "mp3_decoder.h"
 #include "queue.h"
+#include <stdio.h>
 
-#define TEST
+//#define TEST
 #ifdef TEST
 #include <stdio.h>
 #endif
@@ -16,7 +17,6 @@ extern SemaphoreHandle_t catchsuccess_sound;
 extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
 extern QueueHandle_t mp3_queue;
-extern enum game_state;
 
 enum sounds {
   DEFAULT = 0,
@@ -54,7 +54,7 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
-      current_state = GAME;
+      current_state = SCORECARD;
     }
 
     else if (xSemaphoreTake(catchfail_sound, 0)) {
@@ -71,7 +71,7 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
-      current_state = DEFAULT;
+      current_state = CATCHFAIL;
     }
 
     else if (xSemaphoreTake(catchsuccess_sound, 0)) {
@@ -88,7 +88,7 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
-      current_state = DEFAULT;
+      current_state = CATCHSUCCESS;
     }
 
     else if (xSemaphoreTake(game_sound, 0)) {
@@ -105,7 +105,7 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
-      current_state = DEFAULT;
+      current_state = GAME;
     }
 
     else if (xSemaphoreTake(default_sound, 0)) {

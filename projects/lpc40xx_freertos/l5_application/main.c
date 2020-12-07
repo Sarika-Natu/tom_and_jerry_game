@@ -25,6 +25,8 @@ bool command_down = true;
 bool command_left = true;
 bool command_right = true;
 
+extern struct object_axis tom;
+
 void action_on_orientation(void *p);
 SemaphoreHandle_t movement_counter = NULL;
 SemaphoreHandle_t rgb_owner = NULL;
@@ -89,11 +91,10 @@ int main(void) {
               4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
 
   /***************** Game Logic ***************************/
-  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void
-  // *), (void
-  // *)NULL,PRIORITY_LOW, NULL); xTaskCreate(button_task,
-  // "button_task", (512U * 4) / sizeof(void *),(void *)NULL,
-  // PRIORITY_LOW, NULL);
+  xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void *)NULL,
+              PRIORITY_LOW, NULL);
+  xTaskCreate(button_task, "button_task", (512U * 4) / sizeof(void *),
+              (void *)NULL, PRIORITY_LOW, NULL);
 
   /***************** MP3 DECODER***************************/
   mp3_init();
@@ -127,6 +128,8 @@ void RGB_task_2(void *params) {
   while (1) {
 
     tom_image(row_count, col_count);
+    tom.x = row_count;
+    tom.y = col_count;
     vTaskDelay(1);
   }
 }

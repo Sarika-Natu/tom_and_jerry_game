@@ -26,6 +26,9 @@ extern SemaphoreHandle_t catchsuccess_sound;
 extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
 
+void collision_detector(void);
+void player_failed(void);
+
 void game_task(void *p) {
 #ifdef TEST
   puts("Game task");
@@ -57,6 +60,8 @@ void game_task(void *p) {
 #endif
       // Call function for led_matrix GAME screen here.
       maze_one_frame();
+      collision_detector();
+      player_failed();
       xSemaphoreGive(game_sound);
 
       if (change_state) {
@@ -140,4 +145,19 @@ void setup_button_isr(void) {
   lpc_peripheral__enable_interrupt(LPC_PERIPHERAL__GPIO,
                                    gpio__interrupt_dispatcher, "gpio_intr");
   gpio__attach_interrupt(GPIO__PORT_0, 29, GPIO_INTR__FALLING_EDGE, button_isr);
+}
+
+void collision_detector(void) {
+  if ((maze_one_lookup_table[jerry.x][jerry.y]) ==
+      (maze_one_lookup_table[tom.x][tom.y])) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+}
+
+void player_failed(void) {
+  if (maze_one_lookup_table[jerry.x][jerry.y] == 56) {
+    puts("Jerry reached home - Jerry Won");
+    game_screen_state = JERRYWON;
+  }
 }
