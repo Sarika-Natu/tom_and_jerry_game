@@ -34,8 +34,8 @@ void left_movement(void);
 void right_movement(void);
 void up_movement(void);
 void down_movement(void);
-uint8_t col_count = 0;
-uint8_t row_count = 0;
+uint8_t col_count = 1;
+uint8_t row_count = 1;
 
 //#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
