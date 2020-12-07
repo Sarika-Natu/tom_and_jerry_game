@@ -213,7 +213,7 @@ void jerry_image(void) {
           set_pixel(x + 2, y, YELLOW);
           set_pixel(x + 1, y, YELLOW);
           set_pixel(x + 1, y + 1, YELLOW);
-          delay__ms(200);
+          delay__ms(500);
           clear_pixel(x, y);
           clear_pixel(x + 2, y);
           clear_pixel(x + 1, y);

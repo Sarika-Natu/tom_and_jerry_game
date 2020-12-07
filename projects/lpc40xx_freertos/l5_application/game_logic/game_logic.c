@@ -1,5 +1,6 @@
 #include "game_logic.h"
 #include "FreeRTOS.h"
+#include "game_accelerometer.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
@@ -17,7 +18,7 @@ enum game_state {
   SCORECARD = 5
 };
 uint8_t game_screen_state = START_SCREEN;
-
+bool game_on = false;
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
 extern SemaphoreHandle_t default_sound;
@@ -49,20 +50,27 @@ void game_task(void *p) {
         game_screen_state = GAME_ON;
         change_state = false;
       }
+
       break;
 
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
-      // Call function for led_matrix GAME screen here.
+
       maze_one_frame();
+      game_on = true;
+      tom_image(row_count, col_count);
+
       xSemaphoreGive(game_sound);
 
       if (change_state) {
         game_screen_state = PAUSE_PLEASE;
         change_state = false;
       }
+#ifdef TEST
+      puts("GAME_SCREEN_EXIT");
+#endif
       break;
 
     case PAUSE_PLEASE:
