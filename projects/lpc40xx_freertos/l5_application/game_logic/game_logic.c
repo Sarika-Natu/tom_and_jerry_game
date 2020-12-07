@@ -2,6 +2,7 @@
 #include "FreeRTOS.h"
 #include "gpio.h"
 #include "gpio_isr.h"
+#include "led_matrix.h"
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
 #include "semphr.h"
@@ -55,7 +56,9 @@ void game_task(void *p) {
       puts("GAME_SCREEN");
 #endif
       // Call function for led_matrix GAME screen here.
+      maze_one_frame();
       xSemaphoreGive(game_sound);
+
       if (change_state) {
         game_screen_state = PAUSE_PLEASE;
         change_state = false;

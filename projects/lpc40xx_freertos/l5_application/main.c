@@ -50,7 +50,7 @@ QueueHandle_t mp3_queue = NULL;
 SemaphoreHandle_t button_pressed_signal = NULL;
 SemaphoreHandle_t change_game_state = NULL;
 
-void game_task(void *p);
+// void game_task(void *p);
 void button_task(void *p);
 void read_song(void *p);
 void play_song(void *p);
@@ -80,18 +80,20 @@ int main(void) {
 
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
-  xTaskCreate(RGB_task_2, "Jerry_Move", 4096 / (sizeof(void *)), NULL,
+  xTaskCreate(RGB_task_2, "Tom_Move", 4096 / (sizeof(void *)), NULL,
               PRIORITY_MEDIUM, NULL);
 
-  xTaskCreate(tom_motion_update, "tom_motion_update", 4096 / (sizeof(void *)),
-              NULL, PRIORITY_MEDIUM, NULL);
+  // xTaskCreate(tom_motion_update, "tom_motion_update", 4096 / (sizeof(void
+  // *)),     NULL, PRIORITY_MEDIUM, NULL);
   xTaskCreate(action_on_orientation, "Performing_Action",
               4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
 
   /***************** Game Logic ***************************/
-  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void
-  // *)NULL,PRIORITY_LOW, NULL); xTaskCreate(button_task, "button_task", (512U *
-  // 4) / sizeof(void *),(void *)NULL, PRIORITY_LOW, NULL);
+  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void
+  // *), (void
+  // *)NULL,PRIORITY_LOW, NULL); xTaskCreate(button_task,
+  // "button_task", (512U * 4) / sizeof(void *),(void *)NULL,
+  // PRIORITY_LOW, NULL);
 
   /***************** MP3 DECODER***************************/
   mp3_init();
@@ -125,16 +127,6 @@ void RGB_task_2(void *params) {
   while (1) {
 
     tom_image(row_count, col_count);
-    vTaskDelay(1);
-  }
-}
-
-void tom_motion_update(void *params) {
-
-  while (1) {
-    // jerry_image(row_count, col_count);
-    tom_move_on_maze(row_count, col_count);
-
     vTaskDelay(1);
   }
 }
@@ -185,6 +177,7 @@ void action_on_orientation(void *p) {
       break;
     }
     vTaskDelay(100);
+    tom_move_on_maze(row_count, col_count);
   }
 }
 
