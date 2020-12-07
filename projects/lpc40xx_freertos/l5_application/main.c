@@ -76,9 +76,6 @@ int main(void) {
   acceleration__init();
   setup_button_isr();
 
-  xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
-              PRIORITY_HIGH, NULL);
-
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
 
@@ -91,32 +88,14 @@ int main(void) {
   // *)), NULL, PRIORITY_MEDIUM, NULL);
 
   /***************** Game Logic ***************************/
-  // xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void
-  // *)NULL,PRIORITY_MEDIUM, NULL);
-  // xTaskCreate(button_task,
-  // "button_task", (512U * 4) / sizeof(void *),(void *)NULL,
-  // PRIORITY_LOW, NULL);
+  xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void *)NULL,
+              PRIORITY_MEDIUM, NULL);
+  xTaskCreate(button_task, "button_task", (512U * 4) / sizeof(void *),
+              (void *)NULL, PRIORITY_LOW, NULL);
 
-  /***************** MP3 DECODER***************************/
-  // mp3_init();
-  // xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
-  //             (void *)NULL, PRIORITY_LOW, NULL);
-  // xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void
-  // *)NULL,
-  //             PRIORITY_LOW, NULL);
-  /*********************************************************/
   vTaskStartScheduler();
 
   return 0;
-}
-
-static void RGB_frame(void *params) {
-
-  while (1) {
-    // maze_one_frame();
-    start_screen_display();
-    vTaskDelay(1);
-  }
 }
 
 void RGB_task(void *params) {
@@ -219,63 +198,4 @@ void up_movement(void) {
 
   xSemaphoreGive(movement_counter);
 }
-/*******************************************************************/
-
-/*******************************************************************/
-/*                       MP3 DECODER                               */
-/*******************************************************************/
-// void read_song(void *p) {
-//   const char *filename = "RangDeBasanti.mp3";
-//   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
-//   FRESULT result;
-//   FIL file;
-
-//   result = f_open(&file, filename, FA_OPEN_EXISTING | FA_READ);
-//   UINT bytes_read;
-//   while (1) {
-//     xSemaphoreTake(mp3_mutex, portMAX_DELAY);
-
-//     result =
-//         f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
-//     if (0 != result) {
-//       printf("Result of %s is %i\n", filename, result);
-//     }
-
-//     xSemaphoreGive(mp3_mutex);
-//     xQueueSend(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
-//   }
-// }
-
-// void play_song(void *p) {
-//   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
-//   static uint8_t current_count = 0;
-//   uint32_t start_index = 0;
-//   while (1) {
-
-//     if (current_count == 0) {
-//       xQueueReceive(mp3_queue, &bytes_to_read[0], portMAX_DELAY);
-//     }
-//     start_index = (current_count * MAX_BYTES_TX);
-
-//     while (!mp3_dreq_get_status()) {
-// #ifdef TEST
-//       printf("data not requested\n");
-// #endif
-//       vTaskDelay(2);
-//     }
-//     if (xSemaphoreTake(mp3_mutex, portMAX_DELAY)) {
-
-//       send_bytes_to_decoder(start_index, &bytes_to_read[0]);
-//       xSemaphoreGive(mp3_mutex);
-//       if (current_count == (READ_BYTES_FROM_FILE / MAX_BYTES_TX) - 1) {
-//         current_count = 0;
-//       } else {
-//         current_count += 1;
-// #ifdef TEST
-//         printf("count = %d\n", current_count);
-// #endif
-//       }
-//     }
-//   }
-// }
 /*******************************************************************/

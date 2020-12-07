@@ -4,6 +4,7 @@
 #include "matrix_look_up_table.h"
 
 uint8_t row_counter_start_screen = 0;
+uint8_t row_counter_pause_screen = 0;
 
 void start_screen_display(void) {
 
@@ -53,10 +54,9 @@ void start_screen_display(void) {
   else {
     row_counter_start_screen = 0;
   }
-  // vTaskDelay(1);
+  vTaskDelay(1);
   // jerry_image_start_screen();
   // tom_image_start_screen();
-  delay__ms(1);
 }
 
 void jerry_image_start_screen(void) {
@@ -101,4 +101,55 @@ void tom_image_start_screen(void) {
     }
   }
   delay__ms(1);
+}
+
+void pause_screen_display(void) {
+
+  if (row_counter_pause_screen < LEDMATRIX_HEIGHT) {
+    for (uint8_t col_counter_pause_screen = 0;
+         col_counter_pause_screen < LEDMATRIX_WIDTH;
+         col_counter_pause_screen++) {
+      if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                          [col_counter_pause_screen]) == 4) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, BLUE);
+
+      } else if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                                 [col_counter_pause_screen]) ==
+                 2) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, GREEN);
+
+      } else if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                                 [col_counter_pause_screen]) ==
+                 5) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, PINK);
+
+      } else if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                                 [col_counter_pause_screen]) ==
+                 1) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, RED);
+
+      } else if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                                 [col_counter_pause_screen]) ==
+                 6) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, CYAN);
+
+      } else if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                                 [col_counter_pause_screen]) ==
+                 7) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, WHITE);
+
+      } else if ((game_start_display_lookup_table[row_counter_pause_screen]
+                                                 [col_counter_pause_screen]) ==
+                 3) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, YELLOW);
+      }
+    }
+    row_counter_pause_screen++;
+
+  }
+
+  else {
+    row_counter_pause_screen = 0;
+  }
+  vTaskDelay(1);
 }

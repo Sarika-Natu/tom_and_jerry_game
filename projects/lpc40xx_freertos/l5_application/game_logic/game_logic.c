@@ -44,23 +44,21 @@ void game_task(void *p) {
 #ifdef TEST
       puts("START_SCREEN");
 #endif
-      // Call function for led_matrix START screen here.
+      start_screen_display();
       xSemaphoreGive(default_sound);
       if (change_state) {
-        start_screen_display();
         game_screen_state = GAME_ON;
         change_state = false;
       }
+
       break;
 
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
-      // Call function for led_matrix GAME screen here.
       maze_one_frame();
       xSemaphoreGive(game_sound);
-
       if (change_state) {
         game_screen_state = PAUSE_PLEASE;
         change_state = false;
@@ -72,6 +70,7 @@ void game_task(void *p) {
       puts("PAUSE_SCREEN");
 #endif
       // Call function for led_matrix PAUSE screen here.
+      pause_screen_display();
       xSemaphoreGive(default_sound);
       if (change_state) {
         game_screen_state = GAME_ON;
