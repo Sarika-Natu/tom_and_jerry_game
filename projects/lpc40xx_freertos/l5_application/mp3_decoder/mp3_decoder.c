@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #define MAX_BYTES_TX 32U
-#define TEST
+// #define TEST
 
 static void mp3_configure_gpio(void);
 static void mp3_cs(void);

@@ -3,7 +3,7 @@
 #include "queue.h"
 #include <stdio.h>
 
-#define TEST
+// #define TEST
 #ifdef TEST
 #include <stdio.h>
 #endif
@@ -99,7 +99,7 @@ void read_song(void *p) {
     else if (xSemaphoreTake(game_sound, 0)) {
       result = f_close(&file);
       if (0 != result) {
-        printf("File not closed %i\n", result);
+        // printf("File not closed %i\n", result);
       }
       result = f_findfirst(&dj, &fno, "", "2.mp3");
 #ifdef TEST
@@ -120,7 +120,7 @@ void read_song(void *p) {
     else if (xSemaphoreTake(default_sound, 0)) {
       result = f_close(&file);
       if (0 != result) {
-        printf("File not closed %i\n", result);
+        // printf("File not closed %i\n", result);
       }
       result = f_findfirst(&dj, &fno, "", "1.mp3");
 #ifdef TEST
@@ -142,7 +142,7 @@ void read_song(void *p) {
     result =
         f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
     if (0 != result) {
-      printf("Result of read is %i\n", result);
+      // printf("Result of read is %i\n", result);
     }
 
     xSemaphoreGive(mp3_mutex);

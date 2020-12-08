@@ -8,7 +8,7 @@
 #include "lpc_peripherals.h"
 #include "semphr.h"
 
-// #define TEST
+#define TEST
 enum game_state {
   START_SCREEN = 0,
   GAME_ON = 1,
@@ -70,7 +70,7 @@ void game_task(void *p) {
       xSemaphoreGive(game_sound);
 
       collision_detector();
-      player_failed();
+      // player_failed();
 
       if (change_state) {
         game_screen_state = START_SCREEN;
@@ -164,8 +164,7 @@ void collision_detector(void) {
   if (
       ///** TOM :(x + 1, y + 2); //top
       /// JERRY :(x, y); //top
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
+      (
       /// JERRY :(x + 2, y); //bottom
       (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
        maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
@@ -222,3 +221,11 @@ void player_failed(void) {
     game_screen_state = JERRYWON;
   }
 }
+
+// void collision_detector(void) {
+//   if ((maze_one_lookup_table[jerry.x][jerry.y]) ==
+//       (maze_one_lookup_table[tom.x + 3][tom.y + 2])) {
+//     puts("Collision detect - Tom Won");
+//     game_screen_state = TOMWON;
+//   }
+// }
