@@ -20,6 +20,8 @@
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
 
+// #define TEST
+
 bool command_up = true;
 bool command_down = true;
 bool command_left = true;
@@ -34,11 +36,8 @@ void left_movement(void);
 void right_movement(void);
 void up_movement(void);
 void down_movement(void);
-uint8_t col_count = 0;
-uint8_t row_count = 0;
-
-static void RGB_task(void *params);
-static void RGB_frame(void *params);
+uint8_t col_count = 1;
+uint8_t row_count = 1;
 
 //#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
@@ -48,18 +47,15 @@ SemaphoreHandle_t catchsuccess_sound = NULL;
 SemaphoreHandle_t catchfail_sound = NULL;
 SemaphoreHandle_t score_sound = NULL;
 QueueHandle_t mp3_queue = NULL;
+xTaskHandle jerry_motion_suspend;
 
 SemaphoreHandle_t button_pressed_signal = NULL;
 SemaphoreHandle_t change_game_state = NULL;
 
-// void game_task(void *p);
+static void RGB_task(void *params);
 void button_task(void *p);
 void read_song(void *p);
 void play_song(void *p);
-void RGB_clear(void *p);
-
-void RGB_task_2(void *params);
-void tom_motion_update(void *params);
 
 int main(void) {
 
@@ -77,18 +73,13 @@ int main(void) {
   acceleration__init();
   setup_button_isr();
 
-  xTaskCreate(RGB_frame, "RGB_frame", (1024U / sizeof(void *)), NULL,
-              PRIORITY_MEDIUM, NULL);
-
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
-  xTaskCreate(RGB_task_2, "Tom_Move", 4096 / (sizeof(void *)), NULL,
-              PRIORITY_MEDIUM, NULL);
+  xTaskCreate(jerry_motion, "jerry_motion", 4096 / (sizeof(void *)), NULL,
+              PRIORITY_LOW, &jerry_motion_suspend);
 
-  // xTaskCreate(tom_motion_update, "tom_motion_update", 4096 / (sizeof(void
-  // *)),     NULL, PRIORITY_MEDIUM, NULL);
   xTaskCreate(action_on_orientation, "Performing_Action",
-              4096 / (sizeof(void *)), NULL, PRIORITY_MEDIUM, NULL);
+              4096 / (sizeof(void *)), NULL, PRIORITY_LOW, NULL);
 
   /***************** Game Logic ***************************/
   xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void *)NULL,
@@ -103,33 +94,37 @@ int main(void) {
   xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
               PRIORITY_LOW, NULL);
   /*********************************************************/
+
   vTaskStartScheduler();
 
   return 0;
-}
-
-static void RGB_frame(void *params) {
-
-  while (1) {
-    maze_one_frame();
-    vTaskDelay(1);
-  }
 }
 
 void RGB_task(void *params) {
   while (1) {
     update_display();
     vTaskDelay(5);
+    if (jerry_wins) {
+      vTaskSuspend(jerry_motion_suspend);
+    }
   }
 }
 
-void RGB_task_2(void *params) {
-
+void jerry_motion(void *params) {
   while (1) {
+    if (game_on) {
 
-    tom_image(row_count, col_count);
-    tom.x = row_count;
-    tom.y = col_count;
+      jerry_image();
+
+#ifdef TEST
+      fprintf(stderr, "jerry moving\n");
+#endif
+      jerry_image();
+
+    } else {
+      printf("jerry not moving\n");
+    }
+
     vTaskDelay(1);
   }
 }

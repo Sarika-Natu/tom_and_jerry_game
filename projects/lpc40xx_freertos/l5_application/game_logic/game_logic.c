@@ -1,5 +1,6 @@
 #include "game_logic.h"
 #include "FreeRTOS.h"
+#include "game_accelerometer.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
@@ -7,7 +8,7 @@
 #include "lpc_peripherals.h"
 #include "semphr.h"
 
-#define TEST
+// #define TEST
 enum game_state {
   START_SCREEN = 0,
   GAME_ON = 1,
@@ -17,7 +18,9 @@ enum game_state {
   SCORECARD = 5
 };
 uint8_t game_screen_state = START_SCREEN;
+bool game_on = false;
 
+bool jerry_wins = false;
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
 extern SemaphoreHandle_t default_sound;
@@ -52,14 +55,18 @@ void game_task(void *p) {
         game_screen_state = GAME_ON;
         change_state = false;
       }
+
       break;
 
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
-      // Call function for led_matrix GAME screen here.
+
       maze_one_frame();
+      game_on = true;
+      tom_image(row_count, col_count);
+
       collision_detector();
       player_failed();
       xSemaphoreGive(game_sound);
@@ -68,6 +75,9 @@ void game_task(void *p) {
         game_screen_state = PAUSE_PLEASE;
         change_state = false;
       }
+#ifdef TEST
+      puts("GAME_SCREEN_EXIT");
+#endif
       break;
 
     case PAUSE_PLEASE:
@@ -87,6 +97,7 @@ void game_task(void *p) {
       puts("TOMWON");
 #endif
       // Call function for led_matrix TOM-WON screen here.
+      jerry_wins = true;
       xSemaphoreGive(catchsuccess_sound);
       if (change_state) {
         change_state = false;
@@ -98,6 +109,7 @@ void game_task(void *p) {
 #ifdef TEST
       puts("JERRYWON");
 #endif
+      jerry_wins = true;
       // Call function for led_matrix JERRY-WON screen here.
       xSemaphoreGive(catchfail_sound);
       if (change_state) {
@@ -156,7 +168,7 @@ void collision_detector(void) {
 }
 
 void player_failed(void) {
-  if (maze_one_lookup_table[jerry.x][jerry.y] == 56) {
+  if (maze_one_lookup_table[jerry.x][jerry.y] == 60) {
     puts("Jerry reached home - Jerry Won");
     game_screen_state = JERRYWON;
   }

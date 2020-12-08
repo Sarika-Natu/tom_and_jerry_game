@@ -207,9 +207,9 @@ void maze_one_frame(void) {
 
 void jerry_image(void) {
 
-  for (uint8_t counter = 12; counter < 57; counter++) {
-    for (uint8_t y = 0; y < 64; y++) {
-      for (uint8_t x = 0; x < 32; x++) {
+  for (uint8_t counter = 12; counter < 61; counter++) {
+    for (uint8_t y = 2; y < LEDMATRIX_WIDTH; y++) {
+      for (uint8_t x = 2; x < LEDMATRIX_HEIGHT; x++) {
         if (maze_one_lookup_table[x][y] == counter) {
           jerry.x = x;
           jerry.y = y;
@@ -217,7 +217,7 @@ void jerry_image(void) {
           set_pixel(x + 2, y, YELLOW);
           set_pixel(x + 1, y, YELLOW);
           set_pixel(x + 1, y + 1, YELLOW);
-          delay__ms(200);
+          delay__ms(300);
           clear_pixel(x, y);
           clear_pixel(x + 2, y);
           clear_pixel(x + 1, y);
@@ -231,7 +231,8 @@ void jerry_image(void) {
 void tom_image(uint8_t x, uint8_t y) {
 
   clear_display();
-
+  tom.x = x + 3;
+  tom.y = y + 2;
   set_pixel(x + 1, y + 2, RED); // top_movement_2
   set_pixel(x + 2, y + 1, RED); // left_movement_3
   set_pixel(x + 2, y + 2, RED);

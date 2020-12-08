@@ -3,7 +3,7 @@
 #include "queue.h"
 #include <stdio.h>
 
-//#define TEST
+#define TEST
 #ifdef TEST
 #include <stdio.h>
 #endif

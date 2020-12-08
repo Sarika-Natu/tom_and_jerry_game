@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -12,9 +13,14 @@ extern void button_isr(void);
 
 extern void game_task(void *p);
 
+extern void jerry_motion(void *p);
+
 struct object_axis {
   uint8_t x;
   uint8_t y;
 };
 struct object_axis tom;
 struct object_axis jerry;
+extern bool game_on;
+
+extern bool jerry_wins;
