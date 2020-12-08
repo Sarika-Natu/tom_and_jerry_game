@@ -72,7 +72,7 @@ int main(void) {
   clear_display();
   acceleration__init();
   setup_button_isr();
-
+  mp3_init();
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
   xTaskCreate(jerry_motion, "jerry_motion", 4096 / (sizeof(void *)), NULL,
@@ -88,7 +88,7 @@ int main(void) {
               (void *)NULL, PRIORITY_LOW, NULL);
 
   /***************** MP3 DECODER***************************/
-  mp3_init();
+
   xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
               (void *)NULL, PRIORITY_LOW, NULL);
   xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
@@ -122,7 +122,7 @@ void jerry_motion(void *params) {
       jerry_image();
 
     } else {
-      printf("jerry not moving\n");
+      // printf("jerry not moving\n");
     }
 
     vTaskDelay(1);
