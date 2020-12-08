@@ -216,7 +216,7 @@ void jerry_image(void) {
           set_pixel(x, y, YELLOW);         // top
           set_pixel(x + 2, y, YELLOW);     // bottom
           set_pixel(x + 1, y, YELLOW);     // middle_left
-          set_pixel(x + 1, y + 1, YELLOW); // midle_right
+          set_pixel(x + 1, y + 1, YELLOW); // middle_right
           delay__ms(300);
           clear_pixel(x, y);
           clear_pixel(x + 2, y);
@@ -231,13 +231,13 @@ void jerry_image(void) {
 void tom_image(uint8_t x, uint8_t y) {
 
   clear_display();
-  tom.x = x + 3;
-  tom.y = y + 2;
-  set_pixel(x + 1, y + 2, RED);
-  set_pixel(x + 2, y + 1, RED);
-  set_pixel(x + 2, y + 2, RED);
-  set_pixel(x + 2, y + 3, RED);
-  set_pixel(x + 3, y + 2, RED);
+  tom.x = x;
+  tom.y = y;
+  set_pixel(x + 1, y + 2, RED); // top
+  set_pixel(x + 2, y + 1, RED); // left
+  set_pixel(x + 2, y + 2, RED); // middle
+  set_pixel(x + 2, y + 3, RED); // right
+  set_pixel(x + 3, y + 2, RED); // bottom
 
   delay__ms(1);
   clear_pixel(x + 1, y + 2);
