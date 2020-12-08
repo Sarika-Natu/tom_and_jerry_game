@@ -161,58 +161,76 @@ void setup_button_isr(void) {
 }
 
 void collision_detector(void) {
-  if (
+  bool collision_flag = false;
+  if
       ///** TOM :(x + 1, y + 2); //top
       /// JERRY :(x, y); //top
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
-      /// JERRY :(x + 2, y); //bottom
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
-      /// JERRY :(x + 1, y); //middle_left
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
-      /// JERRY :(x + 1, y + 1); //middle_right
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
+      ((maze_one_lookup_table[jerry.x][jerry.y] ==
+        maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
+       /// JERRY :(x + 2, y); //bottom
+       (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
+        maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
+       /// JERRY :(x + 1, y); //middle_left
+       (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
+        maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
+       /// JERRY :(x + 1, y + 1); //middle_right
+       (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
+        maze_one_lookup_table[tom.x + 1][tom.y + 2])) {
+    collision_flag = true;
+
+  } else if
       ///** TOM :(x + 2, y + 1); //left
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
+      ((maze_one_lookup_table[jerry.x][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
+       (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 1])) {
+    collision_flag = true;
+
+  } else if
       ///** TOM :(x + 2, y + 2); //middle
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
+      ((maze_one_lookup_table[jerry.x][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
+       (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 2])) {
+    collision_flag = true;
+
+  } else if
       ///** TOM: (x + 2, y + 3); //right
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
+      ((maze_one_lookup_table[jerry.x][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
+       (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
+        maze_one_lookup_table[tom.x + 2][tom.y + 3])) {
+    collision_flag = true;
+
+  } else if
       ///** TOM: (x + 3, y + 2); //bottom
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2])) {
+      ((maze_one_lookup_table[jerry.x][jerry.y] ==
+        maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
+       (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
+        maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
+        maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
+       (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
+        maze_one_lookup_table[tom.x + 3][tom.y + 2])) {
+    collision_flag = true;
+  }
+
+  if (collision_flag) {
     puts("Collision detect - Tom Won");
     game_screen_state = TOMWON;
+    collision_flag = false;
   }
 }
 
