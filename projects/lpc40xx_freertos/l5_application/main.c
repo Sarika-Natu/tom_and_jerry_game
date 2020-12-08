@@ -5,7 +5,7 @@
 #include "board_io.h"
 #include "common_macros.h"
 #include "delay.h"
-#include "display_start_screen.h"
+#include "display_screen_RGB.h"
 #include "ff.h"
 #include "game_accelerometer.h"
 #include "gpio.h"
@@ -92,6 +92,14 @@ int main(void) {
               PRIORITY_MEDIUM, NULL);
   xTaskCreate(button_task, "button_task", (512U * 4) / sizeof(void *),
               (void *)NULL, PRIORITY_LOW, NULL);
+
+  /***************** MP3 DECODER***************************/
+  mp3_init();
+  xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
+              (void *)NULL, PRIORITY_LOW, NULL);
+  xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
+              PRIORITY_LOW, NULL);
+  /*********************************************************/
 
   vTaskStartScheduler();
 

@@ -4,9 +4,10 @@
 #include "gpio.h"
 #include "matrix_look_up_table.h"
 
-uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH];
 RGB_gpio RGB = {{2, 0}, {2, 1}, {2, 2},  {2, 5},  {2, 4},  {0, 15}, {2, 7},
                 {2, 8}, {2, 9}, {0, 16}, {1, 23}, {1, 20}, {1, 28}};
+
+uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH] = {0};
 
 bool right_move;
 bool left_move;
@@ -28,6 +29,7 @@ void clear_display(void) {
   gpio__reset(RGB.B2);
   gpio__reset(RGB.R2);
   gpio__reset(RGB.G2);
+  update_display();
 }
 void gpio_init(void) {
 
@@ -172,35 +174,6 @@ void display_maze_frame1(void) {
   display_rectangle_width(10, 55, 29, 61, YELLOW);
   display_rectangle_width(2, 15, 5, 50, CYAN);
   display_rectangle_width(2, 55, 5, 61, RED);
-}
-
-uint8_t row_counter = 0;
-
-void maze_one_frame(void) {
-
-  if (row_counter < LEDMATRIX_HEIGHT) {
-    for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
-      if ((maze_one_lookup_table[row_counter][col]) == 4) {
-        set_pixel(row_counter, col, BLUE);
-
-      } else if ((maze_one_lookup_table[row_counter][col]) == 2) {
-        set_pixel(row_counter, col, GREEN);
-
-      } else if ((maze_one_lookup_table[row_counter][col]) == 5) {
-        set_pixel(row_counter, col, PINK);
-
-      } else if ((maze_one_lookup_table[row_counter][col]) == 3) {
-        set_pixel(row_counter, col, YELLOW);
-      }
-    }
-    row_counter++;
-
-  }
-
-  else {
-    row_counter = 0;
-  }
-  vTaskDelay(1);
 }
 
 void jerry_image(void) {

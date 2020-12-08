@@ -24,6 +24,7 @@ extern bool command_down;
 extern bool command_left;
 extern bool command_right;
 
+extern uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH];
 typedef enum {
   BLACK = 0,
   RED = 1,

@@ -1,14 +1,16 @@
 #include "game_logic.h"
 #include "FreeRTOS.h"
-#include "display_start_screen.h"
+#include "delay.h"
+#include "display_screen_RGB.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
+#include "maze.h"
 #include "semphr.h"
 
-#define TEST
+//#define TEST
 enum game_state {
   START_SCREEN = 0,
   GAME_ON = 1,
@@ -18,6 +20,7 @@ enum game_state {
   SCORECARD = 5
 };
 uint8_t game_screen_state = START_SCREEN;
+uint8_t curr_game_state = START_SCREEN;
 
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
@@ -40,6 +43,7 @@ void game_task(void *p) {
     }
 
     switch (game_screen_state) {
+
     case START_SCREEN:
 #ifdef TEST
       puts("START_SCREEN");
@@ -50,13 +54,13 @@ void game_task(void *p) {
         game_screen_state = GAME_ON;
         change_state = false;
       }
-
       break;
 
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
+      // led_matrix__clear_frame_buffer();
       maze_one_frame();
       xSemaphoreGive(game_sound);
       if (change_state) {
@@ -69,8 +73,9 @@ void game_task(void *p) {
 #ifdef TEST
       puts("PAUSE_SCREEN");
 #endif
-      // Call function for led_matrix PAUSE screen here.
+      // led_matrix__clear_frame_buffer();
       pause_screen_display();
+
       xSemaphoreGive(default_sound);
       if (change_state) {
         game_screen_state = GAME_ON;
@@ -83,6 +88,7 @@ void game_task(void *p) {
       puts("TOMWON");
 #endif
       // Call function for led_matrix TOM-WON screen here.
+      tom_won_display();
       xSemaphoreGive(catchsuccess_sound);
       if (change_state) {
         change_state = false;
@@ -95,6 +101,7 @@ void game_task(void *p) {
       puts("JERRYWON");
 #endif
       // Call function for led_matrix JERRY-WON screen here.
+      jerry_won_display();
       xSemaphoreGive(catchfail_sound);
       if (change_state) {
         change_state = false;
