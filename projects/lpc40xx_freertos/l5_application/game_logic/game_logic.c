@@ -64,15 +64,16 @@ void game_task(void *p) {
 #endif
 
       maze_one_frame();
+
       game_on = true;
       tom_image(row_count, col_count);
+      xSemaphoreGive(game_sound);
 
       collision_detector();
       player_failed();
-      xSemaphoreGive(game_sound);
 
       if (change_state) {
-        game_screen_state = PAUSE_PLEASE;
+        game_screen_state = START_SCREEN;
         change_state = false;
       }
 #ifdef TEST

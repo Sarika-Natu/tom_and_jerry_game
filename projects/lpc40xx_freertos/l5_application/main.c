@@ -92,7 +92,7 @@ int main(void) {
   xTaskCreate(read_song, "read_song", (512U * 10) / sizeof(void *),
               (void *)NULL, PRIORITY_LOW, NULL);
   xTaskCreate(play_song, "play_song", (512U * 4) / sizeof(void *), (void *)NULL,
-              PRIORITY_LOW, NULL);
+              PRIORITY_HIGH, NULL);
   /*********************************************************/
 
   vTaskStartScheduler();

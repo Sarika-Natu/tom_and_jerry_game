@@ -26,12 +26,14 @@ enum sounds {
   SCORECARD = 4
 };
 
+FIL file;
+
 void read_song(void *p) {
   uint8_t current_state = DEFAULT;
   const char *filename = "1.mp3";
   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
   FRESULT result;
-  FIL file;
+
   DIR dj;             /* Directory search object */
   static FILINFO fno; /* File information */
 
@@ -39,8 +41,9 @@ void read_song(void *p) {
   UINT bytes_read;
 
   while (1) {
-    result = f_close(&file);
+
     if ((xSemaphoreTake(score_sound, 0))) {
+      result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "5.mp3");
 #ifdef TEST
       if (0 != result) {
@@ -58,6 +61,7 @@ void read_song(void *p) {
     }
 
     else if (xSemaphoreTake(catchfail_sound, 0)) {
+      result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "4.mp3");
 #ifdef TEST
       if (0 != result) {
@@ -75,6 +79,7 @@ void read_song(void *p) {
     }
 
     else if (xSemaphoreTake(catchsuccess_sound, 0)) {
+      result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "3.mp3");
 #ifdef TEST
       if (0 != result) {
@@ -92,6 +97,10 @@ void read_song(void *p) {
     }
 
     else if (xSemaphoreTake(game_sound, 0)) {
+      result = f_close(&file);
+      if (0 != result) {
+        printf("File not closed %i\n", result);
+      }
       result = f_findfirst(&dj, &fno, "", "2.mp3");
 #ifdef TEST
       if (0 != result) {
@@ -109,6 +118,10 @@ void read_song(void *p) {
     }
 
     else if (xSemaphoreTake(default_sound, 0)) {
+      result = f_close(&file);
+      if (0 != result) {
+        printf("File not closed %i\n", result);
+      }
       result = f_findfirst(&dj, &fno, "", "1.mp3");
 #ifdef TEST
       if (0 != result) {
@@ -150,7 +163,7 @@ void play_song(void *p) {
 
     while (!mp3_dreq_get_status()) {
 #ifdef TEST
-      printf("data not requested\n");
+      // printf("data not requested\n");
 #endif
       vTaskDelay(2);
     }
@@ -163,7 +176,7 @@ void play_song(void *p) {
       } else {
         current_count += 1;
 #ifdef TEST
-        printf("count = %d\n", current_count);
+        // printf("count = %d\n", current_count);
 #endif
       }
     }
