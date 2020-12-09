@@ -203,11 +203,3 @@ void player_failed(void) {
     game_screen_state = JERRYWON;
   }
 }
-
-// void collision_detector(void) {
-//   if ((maze_one_lookup_table[jerry.x][jerry.y]) ==
-//       (maze_one_lookup_table[tom.x + 3][tom.y + 2])) {
-//     puts("Collision detect - Tom Won");
-//     game_screen_state = TOMWON;
-//   }
-// }
