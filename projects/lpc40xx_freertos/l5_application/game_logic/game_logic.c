@@ -19,6 +19,8 @@ enum game_state {
 };
 uint8_t game_screen_state = START_SCREEN;
 bool game_on = false;
+
+bool jerry_wins = false;
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
 extern SemaphoreHandle_t default_sound;
@@ -26,6 +28,9 @@ extern SemaphoreHandle_t game_sound;
 extern SemaphoreHandle_t catchsuccess_sound;
 extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
+
+void collision_detector(void);
+void player_failed(void);
 
 void game_task(void *p) {
 #ifdef TEST
@@ -59,13 +64,16 @@ void game_task(void *p) {
 #endif
 
       maze_one_frame();
+
       game_on = true;
       tom_image(row_count, col_count);
-
       xSemaphoreGive(game_sound);
 
+      collision_detector();
+      player_failed();
+
       if (change_state) {
-        game_screen_state = PAUSE_PLEASE;
+        game_screen_state = START_SCREEN;
         change_state = false;
       }
 #ifdef TEST
@@ -90,6 +98,7 @@ void game_task(void *p) {
       puts("TOMWON");
 #endif
       // Call function for led_matrix TOM-WON screen here.
+      jerry_wins = true;
       xSemaphoreGive(catchsuccess_sound);
       if (change_state) {
         change_state = false;
@@ -101,6 +110,7 @@ void game_task(void *p) {
 #ifdef TEST
       puts("JERRYWON");
 #endif
+      jerry_wins = true;
       // Call function for led_matrix JERRY-WON screen here.
       xSemaphoreGive(catchfail_sound);
       if (change_state) {
@@ -149,3 +159,55 @@ void setup_button_isr(void) {
                                    gpio__interrupt_dispatcher, "gpio_intr");
   gpio__attach_interrupt(GPIO__PORT_0, 29, GPIO_INTR__FALLING_EDGE, button_isr);
 }
+
+void collision_detector(void) {
+
+  // Tom botton collide with Jerry cordinates
+  if ((jerry.x == tom.x + 3 && jerry.y == tom.y + 2) ||
+      (jerry.x + 1 == tom.x + 3 && jerry.y + 1 == tom.y + 2) ||
+      (jerry.x + 2 == tom.x + 3 && jerry.y == tom.y + 2) ||
+      (jerry.x + 1 == tom.x + 3 && jerry.y == tom.y + 2)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+  // Tom right collide with Jerry cordinates
+  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 3) ||
+           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+
+  // Tom left  collide with Jerry cordinates
+  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 1) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 1) ||
+           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+  // Tom top collide with Jerry cordinates
+  else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
+           (jerry.x + 1 == tom.x + 1 && jerry.y + 1 == tom.y + 2) ||
+           (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
+           (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+}
+
+void player_failed(void) {
+  if (maze_one_lookup_table[jerry.x][jerry.y] == 60) {
+    puts("Jerry reached home - Jerry Won");
+    game_screen_state = JERRYWON;
+  }
+}
+
+// void collision_detector(void) {
+//   if ((maze_one_lookup_table[jerry.x][jerry.y]) ==
+//       (maze_one_lookup_table[tom.x + 3][tom.y + 2])) {
+//     puts("Collision detect - Tom Won");
+//     game_screen_state = TOMWON;
+//   }
+// }

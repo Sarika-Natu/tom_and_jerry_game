@@ -27,6 +27,10 @@ extern bool command_right;
 extern uint8_t col_count;
 extern uint8_t row_count;
 
+// extern uint8_t counter;
+
+extern struct object_axis tom;
+
 typedef enum {
   BLACK = 0,
   RED = 1,

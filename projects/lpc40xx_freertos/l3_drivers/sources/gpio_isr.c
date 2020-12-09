@@ -82,13 +82,12 @@ void gpio__attach_interrupt(gpio__port_e port, uint32_t pin,
   } else {
   }
 }
-
 /*************************************************************************************
  * This function identifies the interrupt and calls the callback function
  * after clearing the interrupt flag
  */
 void gpio__interrupt_dispatcher(void) {
-  gpio__port_e port;
+  gpio__port_e port = GPIO__PORT_0;
   // Check which pin generated the interrupt
   const int interrupt_pin = read_pin_interrupt(&port);
   // fprintf(stderr, "Interrupt pin %d\n", interrupt_pin);
