@@ -8,4 +8,4 @@ extern void pause_screen_display(void);
 extern void tom_won_display(void);
 extern void jerry_won_display(void);
 
-extern void led_matrix__clear_frame_buffer(void);
+extern void clear_screen_display(void);

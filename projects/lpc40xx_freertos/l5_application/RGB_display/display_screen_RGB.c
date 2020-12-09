@@ -121,6 +121,16 @@ void pause_screen_display(void) {
 
       } else if ((pause_screen_display_lookup_table
                       [row_counter_pause_screen][col_counter_pause_screen]) ==
+                 7) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, WHITE);
+
+      } else if ((pause_screen_display_lookup_table
+                      [row_counter_pause_screen][col_counter_pause_screen]) ==
+                 3) {
+        set_pixel(row_counter_pause_screen, col_counter_pause_screen, YELLOW);
+
+      } else if ((pause_screen_display_lookup_table
+                      [row_counter_pause_screen][col_counter_pause_screen]) ==
                  5) {
         set_pixel(row_counter_pause_screen, col_counter_pause_screen, PINK);
 
@@ -181,139 +191,11 @@ void jerry_won_display(void) {
   vTaskDelay(1);
 }
 
-uint8_t led_matrix_buffer[16][64] = {0};
-
-void led_matrix__clear_frame_buffer(void) {
-  memset(led_matrix_buffer, 0,
-         sizeof((LEDMATRIX_HEIGHT / 2) * LEDMATRIX_WIDTH));
-  // uint8_t row = 0;
-
-  // if (row < LEDMATRIX_HEIGHT) {
-  //   for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
-  //     if ((game_start_display_lookup_table[row][col]) < 7) {
-  //       clear_pixel(row, col);
-  //     }
-  //   }
-  //   row++;
-  // } else {
-  //   row = 0;
-  // }
-}
-
-/*
-void clear_start_screen_display(void) {
-  if (row_counter_start_screen_clear < LEDMATRIX_HEIGHT) {
-    for (uint8_t col_counter_start_screen = 0;
-         col_counter_start_screen < LEDMATRIX_WIDTH;
-         col_counter_start_screen++) {
-      if ((game_start_display_lookup_table[row_counter_start_screen_clear]
-                                          [col_counter_start_screen]) == 4) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-
-      } else if ((game_start_display_lookup_table
-                      [row_counter_start_screen_clear]
-                      [col_counter_start_screen]) == 2) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-      } else if ((game_start_display_lookup_table
-                      [row_counter_start_screen_clear]
-                      [col_counter_start_screen]) == 6) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-
-      } else if ((game_start_display_lookup_table
-                      [row_counter_start_screen_clear]
-                      [col_counter_start_screen]) == 5) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-
-      } else if ((game_start_display_lookup_table
-                      [row_counter_start_screen_clear]
-                      [col_counter_start_screen]) == 1) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-
-      } else if ((game_start_display_lookup_table[row_counter_start_screen]
-                                                 [col_counter_start_screen]) ==
-                 6) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-
-      } else if ((game_start_display_lookup_table
-                      [row_counter_start_screen_clear]
-                      [col_counter_start_screen]) == 7) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-
-      } else if ((game_start_display_lookup_table
-                      [row_counter_start_screen_clear]
-                      [col_counter_start_screen]) == 3) {
-        clear_pixel(row_counter_start_screen_clear, col_counter_start_screen);
-      }
+void clear_screen_display(void) {
+  for (uint8_t y = 0; y < 64; y++) {
+    for (uint8_t x = 0; x < 32; x++) {
+      clear_pixel(x, y);
     }
-    row_counter_start_screen_clear++;
-
   }
-
-  else {
-    row_counter_start_screen_clear = 0;
-  }
+  vTaskDelay(1);
 }
-
-void clear_maze_one_display(void) {
-  if (row_counter_clear_maze_one < LEDMATRIX_HEIGHT) {
-    for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
-      if ((maze_one_lookup_table[row_counter_clear_maze_one][col]) == 4) {
-        clear_pixel(row_counter_clear_maze_one, col);
-
-      } else if ((maze_one_lookup_table[row_counter_clear_maze_one][col]) ==
-                 2) {
-        clear_pixel(row_counter_clear_maze_one, col);
-
-      } else if ((maze_one_lookup_table[row_counter_clear_maze_one][col]) ==
-                 5) {
-        clear_pixel(row_counter_clear_maze_one, col);
-
-      } else if ((maze_one_lookup_table[row_counter_clear_maze_one][col]) ==
-                 3) {
-        clear_pixel(row_counter_clear_maze_one, col);
-      }
-    }
-    row_counter_clear_maze_one++;
-
-  }
-
-  else {
-    row_counter_clear_maze_one = 0;
-  }
-  vTaskDelay(2);
-}
-
-void clear_pause_screen_display(void) {
-
-  if (row_counter_pause_screen_clear < LEDMATRIX_HEIGHT) {
-    for (uint8_t col_counter_pause_screen = 0;
-         col_counter_pause_screen < LEDMATRIX_WIDTH;
-         col_counter_pause_screen++) {
-      if ((pause_screen_display_lookup_table[row_counter_pause_screen_clear]
-                                            [row_counter_pause_screen_clear]) ==
-          4) {
-        set_pixel(row_counter_pause_screen_clear, col_counter_pause_screen,
-                  BLUE);
-
-      } else if ((pause_screen_display_lookup_table
-                      [row_counter_pause_screen_clear]
-                      [col_counter_pause_screen]) == 5) {
-        set_pixel(row_counter_pause_screen_clear, col_counter_pause_screen,
-                  PINK);
-
-      } else if ((pause_screen_display_lookup_table
-                      [row_counter_pause_screen_clear]
-                      [col_counter_pause_screen]) == 1) {
-        set_pixel(row_counter_pause_screen_clear, col_counter_pause_screen,
-                  RED);
-      }
-    }
-    row_counter_pause_screen_clear++;
-
-  }
-
-  else {
-    row_counter_pause_screen = 0;
-  }
-  vTaskDelay(2);
-}*/

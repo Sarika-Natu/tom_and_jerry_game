@@ -53,6 +53,7 @@ void game_task(void *p) {
       if (change_state) {
         game_screen_state = GAME_ON;
         change_state = false;
+        clear_screen_display();
       }
       break;
 
@@ -60,12 +61,12 @@ void game_task(void *p) {
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
-      // led_matrix__clear_frame_buffer();
       maze_one_frame();
       xSemaphoreGive(game_sound);
       if (change_state) {
         game_screen_state = PAUSE_PLEASE;
         change_state = false;
+        clear_screen_display();
       }
       break;
 
@@ -73,13 +74,13 @@ void game_task(void *p) {
 #ifdef TEST
       puts("PAUSE_SCREEN");
 #endif
-      // led_matrix__clear_frame_buffer();
       pause_screen_display();
 
       xSemaphoreGive(default_sound);
       if (change_state) {
         game_screen_state = GAME_ON;
         change_state = false;
+        clear_screen_display();
       }
       break;
 
@@ -87,33 +88,33 @@ void game_task(void *p) {
 #ifdef TEST
       puts("TOMWON");
 #endif
-      // Call function for led_matrix TOM-WON screen here.
       tom_won_display();
       xSemaphoreGive(catchsuccess_sound);
       if (change_state) {
         change_state = false;
+        clear_screen_display();
+        game_screen_state = SCORECARD;
       }
-      game_screen_state = SCORECARD;
       break;
 
     case JERRYWON:
 #ifdef TEST
       puts("JERRYWON");
 #endif
-      // Call function for led_matrix JERRY-WON screen here.
       jerry_won_display();
       xSemaphoreGive(catchfail_sound);
       if (change_state) {
         change_state = false;
+        clear_screen_display();
+        game_screen_state = SCORECARD;
       }
-      game_screen_state = SCORECARD;
+
       break;
 
     case SCORECARD:
 #ifdef TEST
       puts("SCORECARD");
 #endif
-      // Call function for led_matrix SCORECARD screen here.
       xSemaphoreGive(game_sound);
       if (change_state) {
         game_screen_state = START_SCREEN;
