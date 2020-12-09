@@ -70,7 +70,7 @@ void game_task(void *p) {
       xSemaphoreGive(game_sound);
 
       collision_detector();
-      // player_failed();
+      player_failed();
 
       if (change_state) {
         game_screen_state = START_SCREEN;
@@ -161,55 +161,37 @@ void setup_button_isr(void) {
 }
 
 void collision_detector(void) {
-  if (
-      ///** TOM :(x + 1, y + 2); //top
-      /// JERRY :(x, y); //top
-      (
-      /// JERRY :(x + 2, y); //bottom
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
-      /// JERRY :(x + 1, y); //middle_left
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
-      /// JERRY :(x + 1, y + 1); //middle_right
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 1][tom.y + 2]) ||
-      ///** TOM :(x + 2, y + 1); //left
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 1]) ||
-      ///** TOM :(x + 2, y + 2); //middle
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 2]) ||
-      ///** TOM: (x + 2, y + 3); //right
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 2][tom.y + 3]) ||
-      ///** TOM: (x + 3, y + 2); //bottom
-      (maze_one_lookup_table[jerry.x][jerry.y] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 2][jerry.y] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2]) ||
-      (maze_one_lookup_table[jerry.x + 1][jerry.y + 1] ==
-       maze_one_lookup_table[tom.x + 3][tom.y + 2])) {
+
+  // Tom botton collide with Jerry cordinates
+  if ((jerry.x == tom.x + 3 && jerry.y == tom.y + 2) ||
+      (jerry.x + 1 == tom.x + 3 && jerry.y + 1 == tom.y + 2) ||
+      (jerry.x + 2 == tom.x + 3 && jerry.y == tom.y + 2) ||
+      (jerry.x + 1 == tom.x + 3 && jerry.y == tom.y + 2)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+  // Tom right collide with Jerry cordinates
+  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 3) ||
+           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+
+  // Tom left  collide with Jerry cordinates
+  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 1) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 1) ||
+           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
+           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
+    puts("Collision detect - Tom Won");
+    game_screen_state = TOMWON;
+  }
+  // Tom top collide with Jerry cordinates
+  else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
+           (jerry.x + 1 == tom.x + 1 && jerry.y + 1 == tom.y + 2) ||
+           (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
+           (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
     puts("Collision detect - Tom Won");
     game_screen_state = TOMWON;
   }

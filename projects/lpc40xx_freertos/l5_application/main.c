@@ -59,6 +59,7 @@ void play_song(void *p);
 
 int main(void) {
 
+  printf("game starts here");
   movement_counter = xSemaphoreCreateMutex();
   mp3_mutex = xSemaphoreCreateMutex();
   default_sound = xSemaphoreCreateBinary();

@@ -213,6 +213,7 @@ void jerry_image(void) {
         if (maze_one_lookup_table[x][y] == counter) {
           jerry.x = x;
           jerry.y = y;
+          fprintf(stderr, "jerry X %d Y %d \n", jerry.x, jerry.y);
           set_pixel(x, y, YELLOW);         // top
           set_pixel(x + 2, y, YELLOW);     // bottom
           set_pixel(x + 1, y, YELLOW);     // middle_left
