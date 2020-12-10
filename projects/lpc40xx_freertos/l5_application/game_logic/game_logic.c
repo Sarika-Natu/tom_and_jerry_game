@@ -1,14 +1,17 @@
 #include "game_logic.h"
 #include "FreeRTOS.h"
+#include "delay.h"
+#include "display_screen_RGB.h"
 #include "game_accelerometer.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
+#include "maze.h"
 #include "semphr.h"
 
-#define TEST
+//#define TEST
 enum game_state {
   START_SCREEN = 0,
   GAME_ON = 1,
@@ -45,13 +48,15 @@ void game_task(void *p) {
     }
 
     switch (game_screen_state) {
+
     case START_SCREEN:
 #ifdef TEST
       puts("START_SCREEN");
 #endif
-      // Call function for led_matrix START screen here.
+      start_screen_display();
       xSemaphoreGive(default_sound);
       if (change_state) {
+        clear_screen_display();
         game_screen_state = GAME_ON;
         change_state = false;
       }
@@ -64,17 +69,16 @@ void game_task(void *p) {
 #endif
 
       maze_one_frame();
-
       game_on = true;
       tom_image(row_count, col_count);
       xSemaphoreGive(game_sound);
-
       collision_detector();
       player_failed();
 
       if (change_state) {
-        game_screen_state = START_SCREEN;
+        game_screen_state = PAUSE_PLEASE;
         change_state = false;
+        clear_screen_display();
       }
 #ifdef TEST
       puts("GAME_SCREEN_EXIT");
@@ -85,11 +89,12 @@ void game_task(void *p) {
 #ifdef TEST
       puts("PAUSE_SCREEN");
 #endif
-      // Call function for led_matrix PAUSE screen here.
+      pause_screen_display();
       xSemaphoreGive(default_sound);
       if (change_state) {
         game_screen_state = GAME_ON;
         change_state = false;
+        clear_screen_display();
       }
       break;
 
@@ -97,13 +102,16 @@ void game_task(void *p) {
 #ifdef TEST
       puts("TOMWON");
 #endif
+      // clear_screen_display();
+      tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
       jerry_wins = true;
       xSemaphoreGive(catchsuccess_sound);
       if (change_state) {
         change_state = false;
+        game_screen_state = START_SCREEN;
+        clear_screen_display();
       }
-      game_screen_state = SCORECARD;
       break;
 
     case JERRYWON:
@@ -111,19 +119,20 @@ void game_task(void *p) {
       puts("JERRYWON");
 #endif
       jerry_wins = true;
-      // Call function for led_matrix JERRY-WON screen here.
+      jerry_won_display();
       xSemaphoreGive(catchfail_sound);
       if (change_state) {
         change_state = false;
+        game_screen_state = START_SCREEN;
+        clear_screen_display();
       }
-      game_screen_state = SCORECARD;
+
       break;
 
     case SCORECARD:
 #ifdef TEST
       puts("SCORECARD");
 #endif
-      // Call function for led_matrix SCORECARD screen here.
       xSemaphoreGive(game_sound);
       if (change_state) {
         game_screen_state = START_SCREEN;
@@ -169,6 +178,7 @@ void collision_detector(void) {
       (jerry.x + 1 == tom.x + 3 && jerry.y == tom.y + 2)) {
     puts("Collision detect - Tom Won");
     game_screen_state = TOMWON;
+    clear_screen_display();
   }
   // Tom right collide with Jerry cordinates
   else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
@@ -177,6 +187,7 @@ void collision_detector(void) {
            (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
     puts("Collision detect - Tom Won");
     game_screen_state = TOMWON;
+    clear_screen_display();
   }
 
   // Tom left  collide with Jerry cordinates
@@ -186,6 +197,7 @@ void collision_detector(void) {
            (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
     puts("Collision detect - Tom Won");
     game_screen_state = TOMWON;
+    clear_screen_display();
   }
   // Tom top collide with Jerry cordinates
   else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
@@ -194,6 +206,7 @@ void collision_detector(void) {
            (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
     puts("Collision detect - Tom Won");
     game_screen_state = TOMWON;
+    clear_screen_display();
   }
 }
 
@@ -201,5 +214,6 @@ void player_failed(void) {
   if (maze_one_lookup_table[jerry.x][jerry.y] == 60) {
     puts("Jerry reached home - Jerry Won");
     game_screen_state = JERRYWON;
+    clear_screen_display();
   }
 }
