@@ -8,6 +8,7 @@
 #include "display_screen_RGB.h"
 #include "ff.h"
 #include "game_accelerometer.h"
+#include "game_level.h"
 #include "gpio.h"
 #include "i2c.h"
 #include "led_matrix.h"
@@ -107,7 +108,10 @@ void RGB_task(void *params) {
     update_display();
     vTaskDelay(5);
     if (jerry_wins) {
+      jerry_motion_counter = jerry_start_position;
       vTaskSuspend(jerry_motion_suspend);
+    } else {
+      vTaskResume(jerry_motion_suspend);
     }
   }
 }

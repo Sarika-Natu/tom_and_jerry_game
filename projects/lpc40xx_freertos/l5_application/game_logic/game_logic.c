@@ -3,6 +3,7 @@
 #include "delay.h"
 #include "display_screen_RGB.h"
 #include "game_accelerometer.h"
+#include "game_level.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
@@ -11,7 +12,7 @@
 #include "maze.h"
 #include "semphr.h"
 
-//#define TEST
+#define TEST
 enum game_state {
   START_SCREEN = 0,
   GAME_ON = 1,
@@ -31,6 +32,22 @@ extern SemaphoreHandle_t game_sound;
 extern SemaphoreHandle_t catchsuccess_sound;
 extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
+
+uint8_t const jerry_start_position = 12;
+uint8_t const jerry_end_position_1 = 60;
+uint8_t const jerry_end_position_2 = 80;
+uint8_t const jerry_end_position_3 = 89;
+uint8_t const jerry_end_position_4 = 85;
+uint8_t const jerry_end_position_5 = 56;
+
+uint8_t const jerry_end_positions[5] = {
+    jerry_end_position_1, jerry_end_position_2, jerry_end_position_3,
+    jerry_end_position_4, jerry_end_position_5};
+uint8_t level = 0;
+
+maze_selection_t maze_lookup_table[] = {maze_one_frame, maze_two_frame,
+                                        maze_three_frame, maze_four_frame,
+                                        maze_one_frame};
 
 void collision_detector(void);
 void player_failed(void);
@@ -68,7 +85,8 @@ void game_task(void *p) {
       puts("GAME_SCREEN");
 #endif
 
-      maze_one_frame();
+      maze_lookup_table[level]();
+      jerry_wins = false;
       game_on = true;
       tom_image(row_count, col_count);
       xSemaphoreGive(game_sound);
@@ -106,12 +124,25 @@ void game_task(void *p) {
       tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
       jerry_wins = true;
-      xSemaphoreGive(catchsuccess_sound);
-      if (change_state) {
-        change_state = false;
-        game_screen_state = START_SCREEN;
+      if (level < 3) {
+        level++;
+
+        row_count = 1;
+        col_count = 1;
+        game_screen_state = GAME_ON;
+        clear_screen_display();
+      } else {
+        game_screen_state = SCORECARD;
         clear_screen_display();
       }
+      xSemaphoreGive(catchsuccess_sound);
+
+      // if (change_state) {
+      //   change_state = false;
+      //   game_screen_state = START_SCREEN;
+      //   clear_screen_display();
+      // }
+
       break;
 
     case JERRYWON:
@@ -211,9 +242,31 @@ void collision_detector(void) {
 }
 
 void player_failed(void) {
-  if (maze_one_lookup_table[jerry.x][jerry.y] == 60) {
-    puts("Jerry reached home - Jerry Won");
-    game_screen_state = JERRYWON;
-    clear_screen_display();
+  switch (level) {
+  case 0:
+    if (maze_one_lookup_table[jerry.x][jerry.y] == jerry_end_positions[0]) {
+      puts("Jerry reached home - Jerry Won");
+      game_screen_state = JERRYWON;
+      clear_screen_display();
+    }
+    break;
+  case 1:
+    if (maze_two_lookup_table[jerry.x][jerry.y] == jerry_end_positions[1]) {
+      puts("Jerry reached home - Jerry Won");
+      game_screen_state = JERRYWON;
+      clear_screen_display();
+    }
+    break;
+  case 2:
+    if (maze_three_lookup_table[jerry.x][jerry.y] == jerry_end_positions[2]) {
+      puts("Jerry reached home - Jerry Won");
+      game_screen_state = JERRYWON;
+      clear_screen_display();
+    }
+    break;
+
+  default:
+    puts("No case");
+    break;
   }
 }
