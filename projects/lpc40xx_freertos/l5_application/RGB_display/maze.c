@@ -32,7 +32,7 @@ void maze_one_frame(void) {
   vTaskDelay(1);
 }
 
-void maze_two_display(void) {
+void maze_two_frame(void) {
   if (row_counter_set_maze_two < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
       if ((maze_two_lookup_table[row_counter_set_maze_two][col]) == 4) {
@@ -49,7 +49,7 @@ void maze_two_display(void) {
   vTaskDelay(2);
 }
 
-void maze_three_display(void) {
+void maze_three_frame(void) {
   if (row_counter_set_maze_three < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
       if ((maze_three_lookup_table[row_counter_set_maze_three][col]) == 4) {
@@ -67,7 +67,7 @@ void maze_three_display(void) {
   vTaskDelay(2);
 }
 
-void maze_four_display(void) {
+void maze_four_frame(void) {
   if (row_counter_set_maze_four < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
       if ((maze_four_lookup_table[row_counter_set_maze_four][col]) == 4) {

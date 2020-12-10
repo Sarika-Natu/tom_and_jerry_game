@@ -203,7 +203,6 @@ void jerry_image(void) {
 
 void tom_image(uint8_t x, uint8_t y) {
 
-  clear_display();
   tom.x = x;
   tom.y = y;
   set_pixel(x + 1, y + 2, RED); // top
