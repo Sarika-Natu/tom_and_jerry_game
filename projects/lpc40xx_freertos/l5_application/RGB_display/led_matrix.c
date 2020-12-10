@@ -1,6 +1,7 @@
 #include "led_matrix.h"
 #include "delay.h"
 #include "ff.h"
+#include "game_logic.h"
 #include "gpio.h"
 #include "matrix_look_up_table.h"
 
@@ -13,6 +14,7 @@ bool right_move;
 bool left_move;
 bool up_move;
 bool down_move;
+extern struct object_axis jerry;
 
 void disable_display(void) { gpio__set(RGB.OE); }
 
@@ -178,15 +180,17 @@ void display_maze_frame1(void) {
 
 void jerry_image(void) {
 
-  for (uint8_t counter = 12; counter < 57; counter++) {
-    for (uint8_t y = 0; y < 64; y++) {
-      for (uint8_t x = 0; x < 32; x++) {
+  for (uint8_t counter = 12; counter < 61; counter++) {
+    for (uint8_t y = 0; y < LEDMATRIX_WIDTH; y++) {
+      for (uint8_t x = 0; x < LEDMATRIX_HEIGHT; x++) {
         if (maze_one_lookup_table[x][y] == counter) {
-          set_pixel(x, y, YELLOW);
-          set_pixel(x + 2, y, YELLOW);
-          set_pixel(x + 1, y, YELLOW);
-          set_pixel(x + 1, y + 1, YELLOW);
-          delay__ms(200);
+          jerry.x = x;
+          jerry.y = y;
+          set_pixel(x, y, YELLOW);         // top
+          set_pixel(x + 2, y, YELLOW);     // bottom
+          set_pixel(x + 1, y, YELLOW);     // middle_left
+          set_pixel(x + 1, y + 1, YELLOW); // middle_right
+          delay__ms(400);
           clear_pixel(x, y);
           clear_pixel(x + 2, y);
           clear_pixel(x + 1, y);
@@ -200,12 +204,13 @@ void jerry_image(void) {
 void tom_image(uint8_t x, uint8_t y) {
 
   clear_display();
-
-  set_pixel(x + 1, y + 2, RED); // top_movement_2
-  set_pixel(x + 2, y + 1, RED); // left_movement_3
-  set_pixel(x + 2, y + 2, RED);
-  set_pixel(x + 2, y + 3, RED); // botton_movement_4
-  set_pixel(x + 3, y + 2, RED); // right_movement_1
+  tom.x = x;
+  tom.y = y;
+  set_pixel(x + 1, y + 2, RED); // top
+  set_pixel(x + 2, y + 1, RED); // left
+  set_pixel(x + 2, y + 2, RED); // middle
+  set_pixel(x + 2, y + 3, RED); // right
+  set_pixel(x + 3, y + 2, RED); // bottom
 
   delay__ms(1);
   clear_pixel(x + 1, y + 2);

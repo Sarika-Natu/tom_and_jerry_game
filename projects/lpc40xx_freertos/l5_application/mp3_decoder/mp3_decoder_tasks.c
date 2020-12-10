@@ -1,8 +1,9 @@
 #include "ff.h"
 #include "mp3_decoder.h"
 #include "queue.h"
+#include <stdio.h>
 
-#define TEST
+// #define TEST
 #ifdef TEST
 #include <stdio.h>
 #endif
@@ -16,7 +17,6 @@ extern SemaphoreHandle_t catchsuccess_sound;
 extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
 extern QueueHandle_t mp3_queue;
-extern enum game_state;
 
 enum sounds {
   DEFAULT = 0,
@@ -26,12 +26,14 @@ enum sounds {
   SCORECARD = 4
 };
 
+FIL file;
+
 void read_song(void *p) {
   uint8_t current_state = DEFAULT;
   const char *filename = "1.mp3";
   static uint8_t bytes_to_read[READ_BYTES_FROM_FILE];
   FRESULT result;
-  FIL file;
+
   DIR dj;             /* Directory search object */
   static FILINFO fno; /* File information */
 
@@ -39,9 +41,67 @@ void read_song(void *p) {
   UINT bytes_read;
 
   while (1) {
-    result = f_close(&file);
+
     if ((xSemaphoreTake(score_sound, 0))) {
+      result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "5.mp3");
+#ifdef TEST
+      if (0 != result) {
+        printf("Result of song found is %i\n", result);
+      }
+#endif
+      result = f_open(&file, fno.fname, FA_OPEN_EXISTING | FA_READ);
+#ifdef TEST
+      if (0 != result) {
+        printf("Result of open is %i\n", result);
+      }
+      printf("Song name of %s\n", fno.fname);
+#endif
+      current_state = SCORECARD;
+    }
+
+    else if (xSemaphoreTake(catchfail_sound, 0)) {
+      result = f_close(&file);
+      result = f_findfirst(&dj, &fno, "", "4.mp3");
+#ifdef TEST
+      if (0 != result) {
+        printf("Result of song found is %i\n", result);
+      }
+#endif
+      result = f_open(&file, fno.fname, FA_OPEN_EXISTING | FA_READ);
+#ifdef TEST
+      if (0 != result) {
+        printf("Result of open is %i\n", result);
+      }
+      printf("Song name of %s\n", fno.fname);
+#endif
+      current_state = CATCHFAIL;
+    }
+
+    else if (xSemaphoreTake(catchsuccess_sound, 0)) {
+      result = f_close(&file);
+      result = f_findfirst(&dj, &fno, "", "3.mp3");
+#ifdef TEST
+      if (0 != result) {
+        printf("Result of song found is %i\n", result);
+      }
+#endif
+      result = f_open(&file, fno.fname, FA_OPEN_EXISTING | FA_READ);
+#ifdef TEST
+      if (0 != result) {
+        printf("Result of open is %i\n", result);
+      }
+      printf("Song name of %s\n", fno.fname);
+#endif
+      current_state = CATCHSUCCESS;
+    }
+
+    else if (xSemaphoreTake(game_sound, 0)) {
+      result = f_close(&file);
+      if (0 != result) {
+        // printf("File not closed %i\n", result);
+      }
+      result = f_findfirst(&dj, &fno, "", "2.mp3");
 #ifdef TEST
       if (0 != result) {
         printf("Result of song found is %i\n", result);
@@ -57,58 +117,11 @@ void read_song(void *p) {
       current_state = GAME;
     }
 
-    else if (xSemaphoreTake(catchfail_sound, 0)) {
-      result = f_findfirst(&dj, &fno, "", "4.mp3");
-#ifdef TEST
-      if (0 != result) {
-        printf("Result of song found is %i\n", result);
-      }
-#endif
-      result = f_open(&file, fno.fname, FA_OPEN_EXISTING | FA_READ);
-#ifdef TEST
-      if (0 != result) {
-        printf("Result of open is %i\n", result);
-      }
-      printf("Song name of %s\n", fno.fname);
-#endif
-      current_state = DEFAULT;
-    }
-
-    else if (xSemaphoreTake(catchsuccess_sound, 0)) {
-      result = f_findfirst(&dj, &fno, "", "3.mp3");
-#ifdef TEST
-      if (0 != result) {
-        printf("Result of song found is %i\n", result);
-      }
-#endif
-      result = f_open(&file, fno.fname, FA_OPEN_EXISTING | FA_READ);
-#ifdef TEST
-      if (0 != result) {
-        printf("Result of open is %i\n", result);
-      }
-      printf("Song name of %s\n", fno.fname);
-#endif
-      current_state = DEFAULT;
-    }
-
-    else if (xSemaphoreTake(game_sound, 0)) {
-      result = f_findfirst(&dj, &fno, "", "2.mp3");
-#ifdef TEST
-      if (0 != result) {
-        printf("Result of song found is %i\n", result);
-      }
-#endif
-      result = f_open(&file, fno.fname, FA_OPEN_EXISTING | FA_READ);
-#ifdef TEST
-      if (0 != result) {
-        printf("Result of open is %i\n", result);
-      }
-      printf("Song name of %s\n", fno.fname);
-#endif
-      current_state = DEFAULT;
-    }
-
     else if (xSemaphoreTake(default_sound, 0)) {
+      result = f_close(&file);
+      if (0 != result) {
+        // printf("File not closed %i\n", result);
+      }
       result = f_findfirst(&dj, &fno, "", "1.mp3");
 #ifdef TEST
       if (0 != result) {
@@ -129,7 +142,7 @@ void read_song(void *p) {
     result =
         f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
     if (0 != result) {
-      printf("Result of read is %i\n", result);
+      // printf("Result of read is %i\n", result);
     }
 
     xSemaphoreGive(mp3_mutex);
@@ -150,7 +163,7 @@ void play_song(void *p) {
 
     while (!mp3_dreq_get_status()) {
 #ifdef TEST
-      printf("data not requested\n");
+      // printf("data not requested\n");
 #endif
       vTaskDelay(2);
     }
@@ -163,7 +176,7 @@ void play_song(void *p) {
       } else {
         current_count += 1;
 #ifdef TEST
-        printf("count = %d\n", current_count);
+        // printf("count = %d\n", current_count);
 #endif
       }
     }
