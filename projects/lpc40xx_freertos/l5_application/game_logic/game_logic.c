@@ -9,6 +9,7 @@
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
 #include "maze.h"
+#include "mp3_decoder.h"
 #include "semphr.h"
 
 //#define TEST
@@ -55,7 +56,7 @@ void game_task(void *p) {
       puts("START_SCREEN");
 #endif
       start_screen_display();
-      xSemaphoreGive(default_sound);
+      sound.entry = true;
       if (change_state) {
         clear_screen_display();
         game_screen_state = GAME_ON;
@@ -72,7 +73,7 @@ void game_task(void *p) {
       maze_one_frame();
       game_on = true;
       tom_image(row_count, col_count);
-      xSemaphoreGive(game_sound);
+      sound.game = true;
       collision_detector();
       player_failed();
 
@@ -92,7 +93,7 @@ void game_task(void *p) {
 #endif
       pause_or_stop = true;
       pause_screen_display();
-      xSemaphoreGive(default_sound);
+      sound.entry = true;
       if (change_state) {
         game_screen_state = GAME_ON;
         game_on_after_pause = true;
@@ -109,7 +110,7 @@ void game_task(void *p) {
       tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
       pause_or_stop = true;
-      xSemaphoreGive(catchsuccess_sound);
+      sound.catchsuccess = true;
       if (change_state) {
         change_state = false;
         game_screen_state = START_SCREEN;
@@ -123,7 +124,7 @@ void game_task(void *p) {
 #endif
       pause_or_stop = true;
       jerry_won_display();
-      xSemaphoreGive(catchfail_sound);
+      sound.catchfail = true;
       if (change_state) {
         change_state = false;
         game_screen_state = START_SCREEN;
@@ -136,7 +137,7 @@ void game_task(void *p) {
 #ifdef TEST
       puts("SCORECARD");
 #endif
-      xSemaphoreGive(game_sound);
+      sound.scorecard = true;
       if (change_state) {
         game_screen_state = START_SCREEN;
         change_state = false;

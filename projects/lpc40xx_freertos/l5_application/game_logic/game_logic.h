@@ -21,6 +21,7 @@ struct object_axis {
 };
 struct object_axis tom;
 struct object_axis jerry;
+extern struct sounds sound;
 extern bool game_on;
 extern bool game_on_after_pause;
 

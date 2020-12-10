@@ -42,11 +42,6 @@ uint8_t row_count = 1;
 
 //#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
-SemaphoreHandle_t default_sound = NULL;
-SemaphoreHandle_t game_sound = NULL;
-SemaphoreHandle_t catchsuccess_sound = NULL;
-SemaphoreHandle_t catchfail_sound = NULL;
-SemaphoreHandle_t score_sound = NULL;
 QueueHandle_t mp3_queue = NULL;
 xTaskHandle jerry_motion_suspend;
 
@@ -63,11 +58,6 @@ int main(void) {
   printf("game starts here");
   movement_counter = xSemaphoreCreateMutex();
   mp3_mutex = xSemaphoreCreateMutex();
-  default_sound = xSemaphoreCreateBinary();
-  game_sound = xSemaphoreCreateBinary();
-  catchsuccess_sound = xSemaphoreCreateBinary();
-  catchfail_sound = xSemaphoreCreateBinary();
-  score_sound = xSemaphoreCreateBinary();
   mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   gpio_init();
