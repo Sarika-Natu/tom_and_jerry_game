@@ -23,7 +23,8 @@ enum game_state {
 uint8_t game_screen_state = START_SCREEN;
 bool game_on = false;
 
-bool jerry_wins = false;
+bool pause_or_stop = false;
+bool game_on_after_pause = false;
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
 extern SemaphoreHandle_t default_sound;
@@ -89,10 +90,12 @@ void game_task(void *p) {
 #ifdef TEST
       puts("PAUSE_SCREEN");
 #endif
+      pause_or_stop = true;
       pause_screen_display();
       xSemaphoreGive(default_sound);
       if (change_state) {
         game_screen_state = GAME_ON;
+        game_on_after_pause = true;
         change_state = false;
         clear_screen_display();
       }
@@ -105,7 +108,7 @@ void game_task(void *p) {
       // clear_screen_display();
       tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
-      jerry_wins = true;
+      pause_or_stop = true;
       xSemaphoreGive(catchsuccess_sound);
       if (change_state) {
         change_state = false;
@@ -118,7 +121,7 @@ void game_task(void *p) {
 #ifdef TEST
       puts("JERRYWON");
 #endif
-      jerry_wins = true;
+      pause_or_stop = true;
       jerry_won_display();
       xSemaphoreGive(catchfail_sound);
       if (change_state) {

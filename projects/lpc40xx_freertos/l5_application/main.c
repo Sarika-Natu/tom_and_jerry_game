@@ -103,11 +103,24 @@ int main(void) {
 }
 
 void RGB_task(void *params) {
+
   while (1) {
     update_display();
     vTaskDelay(5);
-    if (jerry_wins) {
+    if (pause_or_stop) {
       vTaskSuspend(jerry_motion_suspend);
+      left_move = false;
+      right_move = false;
+      down_move = false;
+      up_move = false;
+      pause_or_stop = false;
+    } else if (game_on_after_pause) {
+      vTaskResume(jerry_motion_suspend);
+      left_move = true;
+      right_move = true;
+      down_move = true;
+      up_move = true;
+      game_on_after_pause = false;
     }
   }
 }
