@@ -17,7 +17,7 @@ bool up_move;
 bool down_move;
 extern struct object_axis jerry;
 
-uint8_t jerry_motion_counter = 12;
+uint8_t jerry_motion_counter = 0;
 
 void disable_display(void) { gpio__set(RGB.OE); }
 

@@ -25,6 +25,6 @@ struct object_axis tom;
 struct object_axis jerry;
 extern bool game_on;
 
-extern bool jerry_wins;
+extern bool change_level;
 
 typedef void (*maze_selection_t)(void);

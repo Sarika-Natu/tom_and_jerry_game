@@ -107,7 +107,7 @@ void RGB_task(void *params) {
   while (1) {
     update_display();
     vTaskDelay(5);
-    if (jerry_wins) {
+    if (change_level) {
       jerry_motion_counter = jerry_start_position;
       vTaskSuspend(jerry_motion_suspend);
     } else {
