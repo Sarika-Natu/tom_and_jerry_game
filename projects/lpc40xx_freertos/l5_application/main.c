@@ -8,6 +8,7 @@
 #include "display_screen_RGB.h"
 #include "ff.h"
 #include "game_accelerometer.h"
+#include "game_level.h"
 #include "gpio.h"
 #include "i2c.h"
 #include "led_matrix.h"
@@ -103,24 +104,14 @@ int main(void) {
 }
 
 void RGB_task(void *params) {
-
   while (1) {
     update_display();
     vTaskDelay(5);
-    if (pause_or_stop) {
+    if (jerry_wins) {
+      jerry_motion_counter = jerry_start_position;
       vTaskSuspend(jerry_motion_suspend);
-      left_move = false;
-      right_move = false;
-      down_move = false;
-      up_move = false;
-      pause_or_stop = false;
-    } else if (game_on_after_pause) {
+    } else {
       vTaskResume(jerry_motion_suspend);
-      left_move = true;
-      right_move = true;
-      down_move = true;
-      up_move = true;
-      game_on_after_pause = false;
     }
   }
 }

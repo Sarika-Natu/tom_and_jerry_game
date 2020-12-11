@@ -32,6 +32,8 @@ extern uint8_t row_count;
 
 extern struct object_axis tom;
 
+typedef void (*maze_table_t)(void);
+
 typedef enum {
   BLACK = 0,
   RED = 1,
@@ -60,6 +62,8 @@ typedef struct {
   gpio_s CLK;
 
 } RGB_gpio;
+
+extern uint8_t jerry_motion_counter;
 
 void gpio_init(void);
 

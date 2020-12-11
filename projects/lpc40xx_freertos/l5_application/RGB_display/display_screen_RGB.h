@@ -7,5 +7,5 @@ void tom_image_start_screen(void);
 extern void pause_screen_display(void);
 extern void tom_won_display(void);
 extern void jerry_won_display(void);
-
+extern void level_one_display(void);
 extern void clear_screen_display(void);

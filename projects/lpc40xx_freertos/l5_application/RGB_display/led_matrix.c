@@ -1,6 +1,7 @@
 #include "led_matrix.h"
 #include "delay.h"
 #include "ff.h"
+#include "game_level.h"
 #include "game_logic.h"
 #include "gpio.h"
 #include "matrix_look_up_table.h"
@@ -15,6 +16,8 @@ bool left_move;
 bool up_move;
 bool down_move;
 extern struct object_axis jerry;
+
+uint8_t jerry_motion_counter = 12;
 
 void disable_display(void) { gpio__set(RGB.OE); }
 
@@ -180,21 +183,61 @@ void display_maze_frame1(void) {
 
 void jerry_image(void) {
 
-  for (uint8_t counter = 12; counter < 61; counter++) {
+  for (jerry_motion_counter = jerry_start_position;
+       jerry_motion_counter <= jerry_end_positions[level];
+       jerry_motion_counter++) {
     for (uint8_t y = 0; y < LEDMATRIX_WIDTH; y++) {
       for (uint8_t x = 0; x < LEDMATRIX_HEIGHT; x++) {
-        if (maze_one_lookup_table[x][y] == counter) {
-          jerry.x = x;
-          jerry.y = y;
-          set_pixel(x, y, YELLOW);         // top
-          set_pixel(x + 2, y, YELLOW);     // bottom
-          set_pixel(x + 1, y, YELLOW);     // middle_left
-          set_pixel(x + 1, y + 1, YELLOW); // middle_right
-          delay__ms(400);
-          clear_pixel(x, y);
-          clear_pixel(x + 2, y);
-          clear_pixel(x + 1, y);
-          clear_pixel(x + 1, y + 1);
+        switch (level) {
+        case 0:
+          if (maze_one_lookup_table[x][y] == jerry_motion_counter) {
+            jerry.x = x;
+            jerry.y = y;
+            set_pixel(x, y, YELLOW);         // top
+            set_pixel(x + 2, y, YELLOW);     // bottom
+            set_pixel(x + 1, y, YELLOW);     // middle_left
+            set_pixel(x + 1, y + 1, YELLOW); // middle_right
+            delay__ms(400);
+            clear_pixel(x, y);
+            clear_pixel(x + 2, y);
+            clear_pixel(x + 1, y);
+            clear_pixel(x + 1, y + 1);
+          }
+          break;
+        case 1:
+          if (maze_two_lookup_table[x][y] == jerry_motion_counter) {
+            jerry.x = x;
+            jerry.y = y;
+            set_pixel(x, y, YELLOW);         // top
+            set_pixel(x + 2, y, YELLOW);     // bottom
+            set_pixel(x + 1, y, YELLOW);     // middle_left
+            set_pixel(x + 1, y + 1, YELLOW); // middle_right
+            delay__ms(400);
+            clear_pixel(x, y);
+            clear_pixel(x + 2, y);
+            clear_pixel(x + 1, y);
+            clear_pixel(x + 1, y + 1);
+          }
+          break;
+        case 2:
+          if (maze_three_lookup_table[x][y] == jerry_motion_counter) {
+            jerry.x = x;
+            jerry.y = y;
+            set_pixel(x, y, YELLOW);         // top
+            set_pixel(x + 2, y, YELLOW);     // bottom
+            set_pixel(x + 1, y, YELLOW);     // middle_left
+            set_pixel(x + 1, y + 1, YELLOW); // middle_right
+            delay__ms(400);
+            clear_pixel(x, y);
+            clear_pixel(x + 2, y);
+            clear_pixel(x + 1, y);
+            clear_pixel(x + 1, y + 1);
+          }
+          break;
+
+        default:
+          puts("No maze exists");
+          break;
         }
       }
     }
@@ -233,51 +276,160 @@ void tom_image(uint8_t x, uint8_t y) {
 
 void tom_move_on_maze(uint8_t x, uint8_t y) {
 
-  if (command_up) {
-    if (maze_one_lookup_table[x + 1][y + 3] == 5 ||
-        maze_one_lookup_table[x + 1][y + 3] == 4 ||
-        maze_one_lookup_table[x + 1][y + 1] == 5 ||
-        maze_one_lookup_table[x + 1][y + 1] == 4) {
-      up_move = false;
-    } else if (maze_one_lookup_table[x][y + 2] == 5 ||
-               maze_one_lookup_table[x][y + 2] == 4) {
-      up_move = false;
+  switch (level) {
+  case 0:
+    if (command_up) {
+      if (maze_one_lookup_table[x + 1][y + 3] == 5 ||
+          maze_one_lookup_table[x + 1][y + 3] == 4 ||
+          maze_one_lookup_table[x + 1][y + 1] == 5 ||
+          maze_one_lookup_table[x + 1][y + 1] == 4) {
+        up_move = false;
+      } else if (maze_one_lookup_table[x][y + 2] == 5 ||
+                 maze_one_lookup_table[x][y + 2] == 4) {
+        up_move = false;
+      }
     }
-  }
 
-  if (command_left) {
-    if (maze_one_lookup_table[x + 1][y + 1] == 5 ||
-        maze_one_lookup_table[x + 1][y + 1] == 4 ||
-        maze_one_lookup_table[x + 3][y + 1] == 5 ||
-        maze_one_lookup_table[x + 3][y + 1] == 4) {
-      left_move = false;
-    } else if (maze_one_lookup_table[x + 2][y] == 5 ||
-               maze_one_lookup_table[x + 2][y] == 4) {
-      left_move = false;
+    if (command_left) {
+      if (maze_one_lookup_table[x + 1][y + 1] == 5 ||
+          maze_one_lookup_table[x + 1][y + 1] == 4 ||
+          maze_one_lookup_table[x + 3][y + 1] == 5 ||
+          maze_one_lookup_table[x + 3][y + 1] == 4) {
+        left_move = false;
+      } else if (maze_one_lookup_table[x + 2][y] == 5 ||
+                 maze_one_lookup_table[x + 2][y] == 4) {
+        left_move = false;
+      }
     }
-  }
 
-  if (command_right) {
-    if (maze_one_lookup_table[x + 1][y + 3] == 5 ||
-        maze_one_lookup_table[x + 1][y + 3] == 4 ||
-        maze_one_lookup_table[x + 3][y + 3] == 5 ||
-        maze_one_lookup_table[x + 3][y + 3] == 4) {
-      right_move = false;
-    } else if (maze_one_lookup_table[x + 2][y + 4] == 5 ||
-               maze_one_lookup_table[x + 2][y + 4] == 4) {
-      right_move = false;
+    if (command_right) {
+      if (maze_one_lookup_table[x + 1][y + 3] == 5 ||
+          maze_one_lookup_table[x + 1][y + 3] == 4 ||
+          maze_one_lookup_table[x + 3][y + 3] == 5 ||
+          maze_one_lookup_table[x + 3][y + 3] == 4) {
+        right_move = false;
+      } else if (maze_one_lookup_table[x + 2][y + 4] == 5 ||
+                 maze_one_lookup_table[x + 2][y + 4] == 4) {
+        right_move = false;
+      }
     }
-  }
 
-  if (command_down) {
-    if (maze_one_lookup_table[x + 3][y + 3] == 5 ||
-        maze_one_lookup_table[x + 3][y + 3] == 4 ||
-        maze_one_lookup_table[x + 3][y + 1] == 5 ||
-        maze_one_lookup_table[x + 3][y + 1] == 4) {
-      down_move = false;
-    } else if (maze_one_lookup_table[x + 4][y + 2] == 5 ||
-               maze_one_lookup_table[x + 4][y + 2] == 4) {
-      down_move = false;
+    if (command_down) {
+      if (maze_one_lookup_table[x + 3][y + 3] == 5 ||
+          maze_one_lookup_table[x + 3][y + 3] == 4 ||
+          maze_one_lookup_table[x + 3][y + 1] == 5 ||
+          maze_one_lookup_table[x + 3][y + 1] == 4) {
+        down_move = false;
+      } else if (maze_one_lookup_table[x + 4][y + 2] == 5 ||
+                 maze_one_lookup_table[x + 4][y + 2] == 4) {
+        down_move = false;
+      }
     }
+    break;
+
+  case 1:
+    if (command_up) {
+      if (maze_two_lookup_table[x + 1][y + 3] == 5 ||
+          maze_two_lookup_table[x + 1][y + 3] == 4 ||
+          maze_two_lookup_table[x + 1][y + 1] == 5 ||
+          maze_two_lookup_table[x + 1][y + 1] == 4) {
+        up_move = false;
+      } else if (maze_two_lookup_table[x][y + 2] == 5 ||
+                 maze_two_lookup_table[x][y + 2] == 4) {
+        up_move = false;
+      }
+    }
+
+    if (command_left) {
+      if (maze_two_lookup_table[x + 1][y + 1] == 5 ||
+          maze_two_lookup_table[x + 1][y + 1] == 4 ||
+          maze_two_lookup_table[x + 3][y + 1] == 5 ||
+          maze_two_lookup_table[x + 3][y + 1] == 4) {
+        left_move = false;
+      } else if (maze_two_lookup_table[x + 2][y] == 5 ||
+                 maze_two_lookup_table[x + 2][y] == 4) {
+        left_move = false;
+      }
+    }
+
+    if (command_right) {
+      if (maze_two_lookup_table[x + 1][y + 3] == 5 ||
+          maze_two_lookup_table[x + 1][y + 3] == 4 ||
+          maze_two_lookup_table[x + 3][y + 3] == 5 ||
+          maze_two_lookup_table[x + 3][y + 3] == 4) {
+        right_move = false;
+      } else if (maze_two_lookup_table[x + 2][y + 4] == 5 ||
+                 maze_two_lookup_table[x + 2][y + 4] == 4) {
+        right_move = false;
+      }
+    }
+
+    if (command_down) {
+      if (maze_two_lookup_table[x + 3][y + 3] == 5 ||
+          maze_two_lookup_table[x + 3][y + 3] == 4 ||
+          maze_two_lookup_table[x + 3][y + 1] == 5 ||
+          maze_two_lookup_table[x + 3][y + 1] == 4) {
+        down_move = false;
+      } else if (maze_two_lookup_table[x + 4][y + 2] == 5 ||
+                 maze_two_lookup_table[x + 4][y + 2] == 4) {
+        down_move = false;
+      }
+    }
+    break;
+
+  case 2:
+
+    if (command_up) {
+      if (maze_three_lookup_table[x + 1][y + 3] == 5 ||
+          maze_three_lookup_table[x + 1][y + 3] == 4 ||
+          maze_three_lookup_table[x + 1][y + 1] == 5 ||
+          maze_three_lookup_table[x + 1][y + 1] == 4) {
+        up_move = false;
+      } else if (maze_three_lookup_table[x][y + 2] == 5 ||
+                 maze_three_lookup_table[x][y + 2] == 4) {
+        up_move = false;
+      }
+    }
+
+    if (command_left) {
+      if (maze_three_lookup_table[x + 1][y + 1] == 5 ||
+          maze_three_lookup_table[x + 1][y + 1] == 4 ||
+          maze_three_lookup_table[x + 3][y + 1] == 5 ||
+          maze_three_lookup_table[x + 3][y + 1] == 4) {
+        left_move = false;
+      } else if (maze_three_lookup_table[x + 2][y] == 5 ||
+                 maze_three_lookup_table[x + 2][y] == 4) {
+        left_move = false;
+      }
+    }
+
+    if (command_right) {
+      if (maze_three_lookup_table[x + 1][y + 3] == 5 ||
+          maze_three_lookup_table[x + 1][y + 3] == 4 ||
+          maze_three_lookup_table[x + 3][y + 3] == 5 ||
+          maze_three_lookup_table[x + 3][y + 3] == 4) {
+        right_move = false;
+      } else if (maze_three_lookup_table[x + 2][y + 4] == 5 ||
+                 maze_three_lookup_table[x + 2][y + 4] == 4) {
+        right_move = false;
+      }
+    }
+
+    if (command_down) {
+      if (maze_three_lookup_table[x + 3][y + 3] == 5 ||
+          maze_three_lookup_table[x + 3][y + 3] == 4 ||
+          maze_three_lookup_table[x + 3][y + 1] == 5 ||
+          maze_three_lookup_table[x + 3][y + 1] == 4) {
+        down_move = false;
+      } else if (maze_three_lookup_table[x + 4][y + 2] == 5 ||
+                 maze_three_lookup_table[x + 4][y + 2] == 4) {
+        down_move = false;
+      }
+    }
+    break;
+
+  default:
+    puts("Tom No Move");
+    break;
   }
 }

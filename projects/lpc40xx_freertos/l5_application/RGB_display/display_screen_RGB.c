@@ -8,6 +8,7 @@ uint8_t row_counter_start_screen = 0;
 uint8_t row_counter_pause_screen = 0;
 uint8_t row_counter_tom_won = 0;
 uint8_t row_counter_jerry_won = 0;
+uint8_t row_counter_level_one = 0;
 
 uint8_t row_counter_start_screen_clear = 0;
 uint8_t row_counter_pause_screen_clear = 0;
@@ -196,6 +197,25 @@ void clear_screen_display(void) {
     for (uint8_t x = 0; x < 32; x++) {
       clear_pixel(x, y);
     }
+  }
+  vTaskDelay(1);
+}
+
+void level_one_display(void) {
+
+  if (row_counter_level_one < LEDMATRIX_HEIGHT) {
+    for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
+      if ((level_one_display_lookup_table[row_counter_level_one][col]) == 2) {
+        set_pixel(row_counter_level_one, col, GREEN);
+
+      } else if ((level_one_display_lookup_table[row_counter_level_one][col]) ==
+                 5) {
+        set_pixel(row_counter_level_one, col, PINK);
+      }
+    }
+    row_counter_level_one++;
+  } else {
+    row_counter_level_one = 0;
   }
   vTaskDelay(1);
 }

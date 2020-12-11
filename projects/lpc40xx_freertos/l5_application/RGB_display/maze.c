@@ -9,6 +9,8 @@ uint8_t row_counter_set_maze_three = 0;
 uint8_t row_counter_set_maze_four = 0;
 
 void maze_one_frame(void) {
+  level_one_display();
+  clear_screen_display();
 
   if (row_counter_maze_one < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
