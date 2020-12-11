@@ -18,15 +18,14 @@ extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
 extern QueueHandle_t mp3_queue;
 
-enum sounds {
+FIL file;
+enum music {
   DEFAULT = 0,
   GAME = 1,
   CATCHSUCCESS = 2,
   CATCHFAIL = 3,
   SCORECARD = 4
 };
-
-FIL file;
 
 void read_song(void *p) {
   uint8_t current_state = DEFAULT;
@@ -42,7 +41,7 @@ void read_song(void *p) {
 
   while (1) {
 
-    if ((xSemaphoreTake(score_sound, 0))) {
+    if ((sound.scorecard) && (current_state != SCORECARD)) {
       result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "5.mp3");
 #ifdef TEST
@@ -57,10 +56,11 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
+      sound.scorecard = false;
       current_state = SCORECARD;
     }
 
-    else if (xSemaphoreTake(catchfail_sound, 0)) {
+    else if ((sound.catchfail) && (current_state != CATCHFAIL)) {
       result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "4.mp3");
 #ifdef TEST
@@ -75,10 +75,11 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
+      sound.catchfail = false;
       current_state = CATCHFAIL;
     }
 
-    else if (xSemaphoreTake(catchsuccess_sound, 0)) {
+    else if ((sound.catchsuccess) && (current_state != CATCHSUCCESS)) {
       result = f_close(&file);
       result = f_findfirst(&dj, &fno, "", "3.mp3");
 #ifdef TEST
@@ -93,10 +94,11 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
+      sound.catchsuccess = false;
       current_state = CATCHSUCCESS;
     }
 
-    else if (xSemaphoreTake(game_sound, 0)) {
+    else if ((sound.game) && (current_state != GAME)) {
       result = f_close(&file);
       if (0 != result) {
         // printf("File not closed %i\n", result);
@@ -114,10 +116,11 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
+      sound.game = false;
       current_state = GAME;
     }
 
-    else if (xSemaphoreTake(default_sound, 0)) {
+    else if ((sound.entry) && (current_state != DEFAULT)) {
       result = f_close(&file);
       if (0 != result) {
         // printf("File not closed %i\n", result);
@@ -135,6 +138,7 @@ void read_song(void *p) {
       }
       printf("Song name of %s\n", fno.fname);
 #endif
+      sound.entry = false;
       current_state = DEFAULT;
     }
 

@@ -42,13 +42,8 @@ void down_movement(void);
 uint8_t col_count = 1;
 uint8_t row_count = 1;
 
-#define TEST
+//#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
-SemaphoreHandle_t default_sound = NULL;
-SemaphoreHandle_t game_sound = NULL;
-SemaphoreHandle_t catchsuccess_sound = NULL;
-SemaphoreHandle_t catchfail_sound = NULL;
-SemaphoreHandle_t score_sound = NULL;
 QueueHandle_t mp3_queue = NULL;
 xTaskHandle jerry_motion_suspend;
 
@@ -65,11 +60,6 @@ int main(void) {
   printf("game starts here");
   movement_counter = xSemaphoreCreateMutex();
   mp3_mutex = xSemaphoreCreateMutex();
-  default_sound = xSemaphoreCreateBinary();
-  game_sound = xSemaphoreCreateBinary();
-  catchsuccess_sound = xSemaphoreCreateBinary();
-  catchfail_sound = xSemaphoreCreateBinary();
-  score_sound = xSemaphoreCreateBinary();
   mp3_queue = xQueueCreate(1, sizeof(uint8_t[READ_BYTES_FROM_FILE]));
 
   gpio_init();
@@ -109,11 +99,25 @@ void RGB_task(void *params) {
     update_display();
     vTaskDelay(5);
     if (change_level) {
-
       vTaskSuspend(jerry_motion_suspend);
       jerry_motion_counter = JERRY_START_POSITION;
     } else {
       vTaskResume(jerry_motion_suspend);
+    }
+    if (pause_or_stop) {
+      vTaskSuspend(jerry_motion_suspend);
+      left_move = false;
+      right_move = false;
+      down_move = false;
+      up_move = false;
+      pause_or_stop = false;
+    } else if (game_on_after_pause) {
+      vTaskResume(jerry_motion_suspend);
+      left_move = true;
+      right_move = true;
+      down_move = true;
+      up_move = true;
+      game_on_after_pause = false;
     }
   }
 }
