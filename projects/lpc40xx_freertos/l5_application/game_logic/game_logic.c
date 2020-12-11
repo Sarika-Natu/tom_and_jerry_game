@@ -33,7 +33,6 @@ extern SemaphoreHandle_t catchsuccess_sound;
 extern SemaphoreHandle_t catchfail_sound;
 extern SemaphoreHandle_t score_sound;
 
-uint8_t const jerry_start_position = 12;
 uint8_t const jerry_end_position_1 = 60;
 uint8_t const jerry_end_position_2 = 80;
 uint8_t const jerry_end_position_3 = 89;
@@ -88,10 +87,7 @@ void game_task(void *p) {
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
-      // if (previous_game_mode == JERRYWON) {
-      //   game_mode_on();
-      //   clear_screen_display();
-      // }
+
       maze_lookup_table[level]();
 
       change_level = false;
@@ -128,10 +124,10 @@ void game_task(void *p) {
 #ifdef TEST
       puts("TOMWON");
 #endif
-      tom_won_display();
+      // tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
       change_level = true;
-      if (level < 3) {
+      if (level < 2) {
         level++;
         row_count = 1;
         col_count = 1;
@@ -139,16 +135,11 @@ void game_task(void *p) {
         game_screen_state = GAME_ON;
 
       } else {
+        level = 0;
         clear_screen_display();
         game_screen_state = SCORECARD;
       }
       xSemaphoreGive(catchsuccess_sound);
-
-      // if (change_state) {
-      //   change_state = false;
-      //   game_screen_state = START_SCREEN;
-      //   clear_screen_display();
-      // }
 
       break;
 
@@ -197,7 +188,6 @@ void game_task(void *p) {
 void button_isr(void) { xSemaphoreGiveFromISR(button_pressed_signal, NULL); }
 
 void button_task(void *p) {
-  // setup_button_isr();
 
   while (1) {
     if (xSemaphoreTake(button_pressed_signal, portMAX_DELAY)) {
@@ -281,7 +271,7 @@ void player_failed(void) {
     break;
 
   default:
-    puts("No case");
+
     break;
   }
 }

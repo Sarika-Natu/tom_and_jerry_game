@@ -16,6 +16,7 @@ bool left_move;
 bool up_move;
 bool down_move;
 extern struct object_axis jerry;
+const uint8_t jerry_start_position = 12;
 
 uint8_t jerry_motion_counter = 0;
 
@@ -236,7 +237,7 @@ void jerry_image(void) {
           break;
 
         default:
-          puts("No maze exists");
+          // puts("No maze exists");
           break;
         }
       }
@@ -429,7 +430,7 @@ void tom_move_on_maze(uint8_t x, uint8_t y) {
     break;
 
   default:
-    puts("Tom No Move");
+
     break;
   }
 }

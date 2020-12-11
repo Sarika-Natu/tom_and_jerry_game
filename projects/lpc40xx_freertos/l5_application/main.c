@@ -21,6 +21,7 @@
 #define CODE
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
+#define JERRY_START_POSITION 12U
 
 // #define TEST
 
@@ -41,7 +42,7 @@ void down_movement(void);
 uint8_t col_count = 1;
 uint8_t row_count = 1;
 
-//#define TEST
+#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
 SemaphoreHandle_t default_sound = NULL;
 SemaphoreHandle_t game_sound = NULL;
@@ -108,8 +109,9 @@ void RGB_task(void *params) {
     update_display();
     vTaskDelay(5);
     if (change_level) {
-      jerry_motion_counter = jerry_start_position;
+
       vTaskSuspend(jerry_motion_suspend);
+      jerry_motion_counter = JERRY_START_POSITION;
     } else {
       vTaskResume(jerry_motion_suspend);
     }
