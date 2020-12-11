@@ -70,7 +70,7 @@ void game_task(void *p) {
       puts("GAME_SCREEN");
 #endif
 
-      maze_one_frame();
+      maze_two_frame();
       game_on = true;
       tom_image(row_count, col_count);
       sound.game = true;
