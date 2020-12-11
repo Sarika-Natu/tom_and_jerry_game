@@ -173,6 +173,7 @@ void game_task(void *p) {
       sound.scorecard = true;
       if (change_state) {
         change_state = false;
+        clear_screen_display();
         game_screen_state = START_SCREEN;
       }
       break;
