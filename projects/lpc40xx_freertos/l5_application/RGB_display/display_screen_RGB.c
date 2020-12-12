@@ -8,10 +8,7 @@ uint8_t row_counter_start_screen = 0;
 uint8_t row_counter_pause_screen = 0;
 uint8_t row_counter_tom_won = 0;
 uint8_t row_counter_jerry_won = 0;
-uint8_t row_counter_level_one = 0;
-
-uint8_t row_counter_start_screen_clear = 0;
-uint8_t row_counter_pause_screen_clear = 0;
+uint8_t row_counter_level_screen = 0;
 
 void start_screen_display(void) {
 
@@ -201,21 +198,35 @@ void clear_screen_display(void) {
   vTaskDelay(1);
 }
 
-void level_one_display(void) {
-
-  if (row_counter_level_one < LEDMATRIX_HEIGHT) {
+void level_display(void) {
+  if (row_counter_level_screen < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
-      if ((level_one_display_lookup_table[row_counter_level_one][col]) == 2) {
-        set_pixel(row_counter_level_one, col, GREEN);
+      if ((level_display_lookup_table[row_counter_level_screen][col]) == 2) {
+        set_pixel(row_counter_level_screen, col, GREEN);
 
-      } else if ((level_one_display_lookup_table[row_counter_level_one][col]) ==
+      } else if ((level_display_lookup_table[row_counter_level_screen][col]) ==
+                 7) {
+        set_pixel(row_counter_level_screen, col, WHITE);
+
+      } else if ((level_display_lookup_table[row_counter_level_screen][col]) ==
+                 3) {
+        set_pixel(row_counter_level_screen, col, YELLOW);
+
+      } else if ((level_display_lookup_table[row_counter_level_screen][col]) ==
                  5) {
-        set_pixel(row_counter_level_one, col, PINK);
+        set_pixel(row_counter_pause_screen, col, PINK);
+
+      } else if ((level_display_lookup_table[row_counter_level_screen][col]) ==
+                 1) {
+        set_pixel(row_counter_level_screen, col, RED);
       }
     }
-    row_counter_level_one++;
-  } else {
-    row_counter_level_one = 0;
+    row_counter_level_screen++;
+
+  }
+
+  else {
+    row_counter_level_screen = 0;
   }
   vTaskDelay(1);
 }

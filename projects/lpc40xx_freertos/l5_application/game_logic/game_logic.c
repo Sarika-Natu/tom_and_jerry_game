@@ -31,25 +31,18 @@ bool change_level = false;
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
 
-uint8_t const jerry_end_position_1 = 60;
-uint8_t const jerry_end_position_2 = 80;
-uint8_t const jerry_end_position_3 = 89;
-uint8_t const jerry_end_position_4 = 85;
-uint8_t const jerry_end_position_5 = 56;
+uint8_t const jerry_end_position_1 = 211;
+uint8_t const jerry_end_position_2 = 128;
+uint8_t const jerry_end_position_3 = 181;
 
 uint8_t previous_game_mode = 0;
-uint8_t const jerry_end_positions[5] = {
-    jerry_end_position_1, jerry_end_position_2, jerry_end_position_3,
-    jerry_end_position_4, jerry_end_position_5};
+uint8_t const jerry_end_positions[3] = {
+    jerry_end_position_1, jerry_end_position_2, jerry_end_position_3};
 uint8_t level = 0;
 uint8_t tom_lives = 3;
-maze_selection_t maze_lookup_table[] = {maze_one_frame, maze_two_frame,
-                                        maze_three_frame, maze_four_frame,
-                                        maze_one_frame};
+maze_selection_t maze_lookup_table[3] = {maze_one_frame, maze_two_frame,
+                                         maze_three_frame};
 
-maze_selection_t display_game_level[] = {level_one_display, level_one_display,
-                                         level_one_display, level_one_display,
-                                         level_one_display};
 void collision_detector(void);
 void player_failed(void);
 
@@ -88,8 +81,12 @@ void game_task(void *p) {
 #endif
       // fprintf(stderr, "Jerry.x = %d | Jerry.y =%d | motion_counter=%d \n",
       //         jerry.x, jerry.y, jerry_motion_counter);
+      // fprintf(stderr, "Tom_lives %d\n", tom_lives);
       maze_lookup_table[level]();
       change_level = false;
+
+      // level_display();
+      // maze_two_frame();
       game_on = true;
       tom_image(row_count, col_count);
       sound.game = true;
@@ -147,6 +144,7 @@ void game_task(void *p) {
       puts("JERRYWON");
 
 #endif
+
       pause_or_stop = true;
       change_level = true;
       jerry_won_display();
@@ -256,9 +254,9 @@ void collision_detector(void) {
 void player_failed(void) {
   switch (level) {
   case 0:
-    if ((jerry.x == 1) && (jerry.y == 54)) {
+    if ((jerry.x == 26) && (jerry.y == 56)) {
       puts("Jerry reached home - Jerry Won");
-      jerry.x = 14;
+      jerry.x = 16;
       jerry.y = 2;
       change_level = true;
       game_screen_state = JERRYWON;
@@ -266,9 +264,9 @@ void player_failed(void) {
     }
     break;
   case 1:
-    if ((jerry.x == 1) && (jerry.y == 54)) {
+    if ((jerry.x == 2) && (jerry.y == 54)) {
       puts("Jerry reached home - Jerry Won");
-      jerry.x = 14;
+      jerry.x = 19;
       jerry.y = 2;
       change_level = true;
       game_screen_state = JERRYWON;
@@ -276,7 +274,7 @@ void player_failed(void) {
     }
     break;
   case 2:
-    if ((jerry.x == 1) && (jerry.y == 54)) {
+    if ((jerry.x == 27) && (jerry.y == 38)) {
       puts("Jerry reached home - Jerry Won");
       jerry.x = 14;
       jerry.y = 2;
@@ -291,5 +289,3 @@ void player_failed(void) {
     break;
   }
 }
-
-void game_mode_on(void) { display_game_level[level](); }
