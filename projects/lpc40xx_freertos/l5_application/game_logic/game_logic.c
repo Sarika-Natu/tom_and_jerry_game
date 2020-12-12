@@ -69,8 +69,8 @@ void game_task(void *p) {
 #ifdef TEST
       puts("GAME_SCREEN");
 #endif
-
-      maze_one_frame();
+      level_display();
+      // maze_two_frame();
       game_on = true;
       tom_image(row_count, col_count);
       sound.game = true;
