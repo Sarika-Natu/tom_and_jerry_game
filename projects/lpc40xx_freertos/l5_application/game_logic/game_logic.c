@@ -44,7 +44,7 @@ uint8_t const jerry_end_positions[5] = {
     jerry_end_position_1, jerry_end_position_2, jerry_end_position_3,
     jerry_end_position_4, jerry_end_position_5};
 uint8_t level = 0;
-
+uint8_t tom_lives = 3;
 maze_selection_t maze_lookup_table[] = {maze_one_frame, maze_two_frame,
                                         maze_three_frame, maze_four_frame,
                                         maze_one_frame};
@@ -86,10 +86,11 @@ void game_task(void *p) {
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
+
 #endif
-
+      // fprintf(stderr, "Jerry.x = %d | Jerry.y =%d | motion_counter=%d \n",
+      //         jerry.x, jerry.y, jerry_motion_counter);
       maze_lookup_table[level]();
-
       change_level = false;
       game_on = true;
       tom_image(row_count, col_count);
@@ -102,9 +103,7 @@ void game_task(void *p) {
         clear_screen_display();
         game_screen_state = PAUSE_PLEASE;
       }
-#ifdef TEST
-      puts("GAME_SCREEN_EXIT");
-#endif
+
       break;
 
     case PAUSE_PLEASE:
@@ -139,6 +138,9 @@ void game_task(void *p) {
         clear_screen_display();
         game_screen_state = SCORECARD;
       }
+#ifdef TEST
+      puts("JERRY_SCREEN_EXIT");
+#endif
       xSemaphoreGive(catchsuccess_sound);
 
       break;
@@ -146,15 +148,20 @@ void game_task(void *p) {
     case JERRYWON:
 #ifdef TEST
       puts("JERRYWON");
+
 #endif
-      change_level = true;
-      jerry_won_display();
+
       xSemaphoreGive(catchfail_sound);
-      if (change_state) {
-        previous_game_mode = JERRYWON;
-        change_state = false;
+      if (tom_lives > 1) {
+        tom_lives--;
+        row_count = 1;
+        col_count = 1;
         clear_screen_display();
-        game_screen_state = START_SCREEN;
+        game_screen_state = GAME_ON;
+      } else {
+        // tom_lives = 3;
+        clear_screen_display();
+        game_screen_state = SCORECARD;
       }
 
       break;
@@ -163,12 +170,13 @@ void game_task(void *p) {
 #ifdef TEST
       puts("SCORECARD");
 #endif
-      tom_won_display();
+      // tom_won_display();
+      jerry_won_display();
       xSemaphoreGive(game_sound);
-      if (change_state) {
-        change_state = false;
-        game_screen_state = START_SCREEN;
-      }
+      // if (change_state) {
+      //   change_state = false;
+      //   game_screen_state = START_SCREEN;
+      // }
       break;
 
     default:
@@ -249,22 +257,31 @@ void collision_detector(void) {
 void player_failed(void) {
   switch (level) {
   case 0:
-    if (maze_one_lookup_table[jerry.x][jerry.y] == jerry_end_positions[0]) {
+    if ((jerry.x == 1) && (jerry.y == 54)) {
       puts("Jerry reached home - Jerry Won");
+      jerry.x = 14;
+      jerry.y = 2;
+      change_level = true;
       game_screen_state = JERRYWON;
       clear_screen_display();
     }
     break;
   case 1:
-    if (maze_two_lookup_table[jerry.x][jerry.y] == jerry_end_positions[1]) {
+    if ((jerry.x == 1) && (jerry.y == 54)) {
       puts("Jerry reached home - Jerry Won");
+      jerry.x = 14;
+      jerry.y = 2;
+      change_level = true;
       game_screen_state = JERRYWON;
       clear_screen_display();
     }
     break;
   case 2:
-    if (maze_three_lookup_table[jerry.x][jerry.y] == jerry_end_positions[2]) {
+    if ((jerry.x == 1) && (jerry.y == 54)) {
       puts("Jerry reached home - Jerry Won");
+      jerry.x = 14;
+      jerry.y = 2;
+      change_level = true;
       game_screen_state = JERRYWON;
       clear_screen_display();
     }

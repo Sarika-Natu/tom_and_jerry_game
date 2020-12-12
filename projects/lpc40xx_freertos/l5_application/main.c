@@ -80,14 +80,14 @@ int main(void) {
   xTaskCreate(RGB_task, "RGB_task", 4096 / (sizeof(void *)), NULL,
               PRIORITY_HIGH, NULL);
   xTaskCreate(jerry_motion, "jerry_motion", 4096 / (sizeof(void *)), NULL,
-              PRIORITY_LOW, &jerry_motion_suspend);
+              PRIORITY_MEDIUM, &jerry_motion_suspend);
 
   xTaskCreate(action_on_orientation, "Performing_Action",
               4096 / (sizeof(void *)), NULL, PRIORITY_LOW, NULL);
 
   /***************** Game Logic ***************************/
   xTaskCreate(game_task, "game_task", (512U * 4) / sizeof(void *), (void *)NULL,
-              PRIORITY_LOW, NULL);
+              PRIORITY_MEDIUM, NULL);
   xTaskCreate(button_task, "button_task", (512U * 4) / sizeof(void *),
               (void *)NULL, PRIORITY_LOW, NULL);
 
@@ -109,10 +109,10 @@ void RGB_task(void *params) {
     update_display();
     vTaskDelay(5);
     if (change_level) {
-
       vTaskSuspend(jerry_motion_suspend);
       jerry_motion_counter = JERRY_START_POSITION;
     } else {
+
       vTaskResume(jerry_motion_suspend);
     }
   }
@@ -127,7 +127,6 @@ void jerry_motion(void *params) {
 #ifdef TEST
       fprintf(stderr, "jerry moving\n");
 #endif
-      jerry_image();
 
     } else {
       // printf("jerry not moving\n");
