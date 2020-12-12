@@ -1,8 +1,8 @@
+#include "maze.h"
 #include "display_screen_RGB.h"
 #include "ff.h"
 #include "led_matrix.h"
 #include "stdio.h"
-#include "maze.h"
 
 uint8_t row_counter_maze_one = 0;
 uint8_t row_counter_set_maze_two = 0;

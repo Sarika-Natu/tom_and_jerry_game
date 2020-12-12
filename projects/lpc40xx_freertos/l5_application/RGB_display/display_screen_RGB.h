@@ -9,3 +9,4 @@ extern void tom_won_display(void);
 extern void jerry_won_display(void);
 
 extern void clear_screen_display(void);
+extern void level_display(void);

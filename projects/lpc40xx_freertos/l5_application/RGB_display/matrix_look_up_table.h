@@ -19,3 +19,6 @@ extern const uint8_t pause_screen_display_lookup_table[LEDMATRIX_HEIGHT]
                                                       [LEDMATRIX_WIDTH];
 
 extern const uint8_t RGB_Matrix_lookup_table[LEDMATRIX_HEIGHT][LEDMATRIX_WIDTH];
+
+extern const uint8_t level_display_lookup_table[LEDMATRIX_HEIGHT]
+                                               [LEDMATRIX_WIDTH];
