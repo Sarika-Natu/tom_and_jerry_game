@@ -16,11 +16,13 @@
 // #define TEST
 enum game_state {
   START_SCREEN = 0,
-  GAME_ON = 1,
-  PAUSE_PLEASE = 2,
-  TOMWON = 3,
-  JERRYWON = 4,
-  SCORECARD = 5
+  PLAYER_READY = 1,
+  NEXT_LEVEL_SCREEN = 2,
+  GAME_ON = 3,
+  PAUSE_PLEASE = 4,
+  TOM_WON = 5,
+  JERRY_WON = 6,
+  SCORE_CARD = 7
 };
 uint8_t game_screen_state = START_SCREEN;
 bool game_on = false;
@@ -42,6 +44,7 @@ uint8_t level = 0;
 uint8_t tom_lives = 3;
 maze_selection_t maze_lookup_table[3] = {maze_one_frame, maze_two_frame,
                                          maze_three_frame};
+bool tom_or_jerry_won_decision = false;
 
 void collision_detector(void);
 void player_failed(void);
@@ -69,6 +72,33 @@ void game_task(void *p) {
       if (change_state) {
         clear_screen_display();
         change_state = false;
+        game_screen_state = PLAYER_READY;
+      }
+
+      break;
+
+    case PLAYER_READY:
+#ifdef TEST
+      puts("LEVEL_SCREEN");
+#endif
+      player_ready_display();
+
+      if (change_state) {
+        clear_screen_display();
+        change_state = false;
+        game_screen_state = GAME_ON;
+      }
+      break;
+
+    case NEXT_LEVEL_SCREEN:
+#ifdef TEST
+      puts("LEVEL_SCREEN");
+#endif
+      level_display();
+
+      if (change_state) {
+        clear_screen_display();
+        change_state = false;
         game_screen_state = GAME_ON;
       }
 
@@ -79,14 +109,9 @@ void game_task(void *p) {
       puts("GAME_SCREEN");
 
 #endif
-      // fprintf(stderr, "Jerry.x = %d | Jerry.y =%d | motion_counter=%d \n",
-      //         jerry.x, jerry.y, jerry_motion_counter);
-      // fprintf(stderr, "Tom_lives %d\n", tom_lives);
       maze_lookup_table[level]();
       change_level = false;
 
-      // level_display();
-      // maze_two_frame();
       game_on = true;
       tom_image(row_count, col_count);
       sound.game = true;
@@ -116,31 +141,30 @@ void game_task(void *p) {
       }
       break;
 
-    case TOMWON:
+    case TOM_WON:
 #ifdef TEST
       puts("TOMWON");
 #endif
-      // tom_won_display();
-      // Call function for led_matrix TOM-WON screen here.
       tom_lives = 3;
       pause_or_stop = true;
       sound.catchsuccess = true;
       change_level = true;
       if (level < 2) {
+        clear_screen_display();
         level++;
         row_count = 1;
         col_count = 1;
-        clear_screen_display();
-        game_screen_state = GAME_ON;
+        game_screen_state = NEXT_LEVEL_SCREEN;
 
       } else {
         level = 0;
         clear_screen_display();
-        game_screen_state = SCORECARD;
+        tom_or_jerry_won_decision = false;
+        game_screen_state = SCORE_CARD;
       }
       break;
 
-    case JERRYWON:
+    case JERRY_WON:
 #ifdef TEST
       puts("JERRYWON");
 
@@ -151,23 +175,29 @@ void game_task(void *p) {
       sound.catchfail = true;
 
       if (tom_lives > 1) {
+
         tom_lives--;
         row_count = 1;
         col_count = 1;
         game_screen_state = GAME_ON;
       } else {
-        // tom_lives = 3;
+        tom_or_jerry_won_decision = true;
         clear_screen_display();
-        game_screen_state = SCORECARD;
+        game_screen_state = SCORE_CARD;
       }
 
       break;
 
-    case SCORECARD:
+    case SCORE_CARD:
 #ifdef TEST
       puts("SCORECARD");
 #endif
-      jerry_won_display();
+      if (tom_or_jerry_won_decision) {
+        game_over_display();
+      } else {
+        player_won_display();
+      }
+
       sound.scorecard = true;
       if (change_state) {
         change_state = false;
@@ -177,7 +207,7 @@ void game_task(void *p) {
       break;
 
     default:
-      clear_screen_display();
+
       puts("DEFAULT");
       if (change_state) {
         clear_screen_display();
@@ -193,7 +223,6 @@ void game_task(void *p) {
 void button_isr(void) { xSemaphoreGiveFromISR(button_pressed_signal, NULL); }
 
 void button_task(void *p) {
-
   while (1) {
     if (xSemaphoreTake(button_pressed_signal, portMAX_DELAY)) {
       xSemaphoreGive(change_game_state);
@@ -218,7 +247,7 @@ void collision_detector(void) {
       (jerry.x + 2 == tom.x + 3 && jerry.y == tom.y + 2) ||
       (jerry.x + 1 == tom.x + 3 && jerry.y == tom.y + 2)) {
     puts("Collision detect - Tom Won");
-    game_screen_state = TOMWON;
+    game_screen_state = TOM_WON;
     clear_screen_display();
   }
   // Tom right collide with Jerry cordinates
@@ -227,7 +256,7 @@ void collision_detector(void) {
            (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
            (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
     puts("Collision detect - Tom Won");
-    game_screen_state = TOMWON;
+    game_screen_state = TOM_WON;
     clear_screen_display();
   }
 
@@ -237,7 +266,7 @@ void collision_detector(void) {
            (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
            (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
     puts("Collision detect - Tom Won");
-    game_screen_state = TOMWON;
+    game_screen_state = TOM_WON;
     clear_screen_display();
   }
   // Tom top collide with Jerry cordinates
@@ -246,7 +275,7 @@ void collision_detector(void) {
            (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
            (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
     puts("Collision detect - Tom Won");
-    game_screen_state = TOMWON;
+    game_screen_state = TOM_WON;
     clear_screen_display();
   }
 }
@@ -259,7 +288,7 @@ void player_failed(void) {
       jerry.x = 16;
       jerry.y = 2;
       change_level = true;
-      game_screen_state = JERRYWON;
+      game_screen_state = JERRY_WON;
       clear_screen_display();
     }
     break;
@@ -269,7 +298,7 @@ void player_failed(void) {
       jerry.x = 19;
       jerry.y = 2;
       change_level = true;
-      game_screen_state = JERRYWON;
+      game_screen_state = JERRY_WON;
       clear_screen_display();
     }
     break;
@@ -279,7 +308,7 @@ void player_failed(void) {
       jerry.x = 14;
       jerry.y = 2;
       change_level = true;
-      game_screen_state = JERRYWON;
+      game_screen_state = JERRY_WON;
       clear_screen_display();
     }
     break;
