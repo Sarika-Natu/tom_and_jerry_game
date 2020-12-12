@@ -122,6 +122,7 @@ void game_task(void *p) {
 #endif
       // tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
+      tom_lives = 3;
       pause_or_stop = true;
       sound.catchsuccess = true;
       change_level = true;
@@ -147,7 +148,6 @@ void game_task(void *p) {
 
       pause_or_stop = true;
       change_level = true;
-      jerry_won_display();
       sound.catchfail = true;
 
       if (tom_lives > 1) {
