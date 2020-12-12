@@ -6,6 +6,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+struct sounds {
+  bool entry : 1;
+  bool game : 1;
+  bool catchsuccess : 1;
+  bool catchfail : 1;
+  bool scorecard : 1;
+};
+struct sounds sound;
+
 #define MP3_WRITE 0x02
 #define MP3_READ 0x03
 

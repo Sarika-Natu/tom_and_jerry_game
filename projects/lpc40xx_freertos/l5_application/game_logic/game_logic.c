@@ -10,6 +10,7 @@
 #include "lpc40xx.h"
 #include "lpc_peripherals.h"
 #include "maze.h"
+#include "mp3_decoder.h"
 #include "semphr.h"
 
 // #define TEST
@@ -24,14 +25,11 @@ enum game_state {
 uint8_t game_screen_state = START_SCREEN;
 bool game_on = false;
 
+bool pause_or_stop = false;
+bool game_on_after_pause = false;
 bool change_level = false;
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
-extern SemaphoreHandle_t default_sound;
-extern SemaphoreHandle_t game_sound;
-extern SemaphoreHandle_t catchsuccess_sound;
-extern SemaphoreHandle_t catchfail_sound;
-extern SemaphoreHandle_t score_sound;
 
 uint8_t const jerry_end_position_1 = 60;
 uint8_t const jerry_end_position_2 = 80;
@@ -74,7 +72,7 @@ void game_task(void *p) {
       puts("START_SCREEN");
 #endif
       start_screen_display();
-      xSemaphoreGive(default_sound);
+      sound.entry = true;
       if (change_state) {
         clear_screen_display();
         change_state = false;
@@ -94,7 +92,7 @@ void game_task(void *p) {
       change_level = false;
       game_on = true;
       tom_image(row_count, col_count);
-      xSemaphoreGive(game_sound);
+      sound.game = true;
       collision_detector();
       player_failed();
 
@@ -110,9 +108,11 @@ void game_task(void *p) {
 #ifdef TEST
       puts("PAUSE_SCREEN");
 #endif
+      pause_or_stop = true;
       pause_screen_display();
-      xSemaphoreGive(default_sound);
+      sound.entry = true;
       if (change_state) {
+        game_on_after_pause = true;
         change_state = false;
         clear_screen_display();
         game_screen_state = GAME_ON;
@@ -125,6 +125,8 @@ void game_task(void *p) {
 #endif
       // tom_won_display();
       // Call function for led_matrix TOM-WON screen here.
+      pause_or_stop = true;
+      sound.catchsuccess = true;
       change_level = true;
       if (level < 2) {
         level++;
@@ -138,11 +140,6 @@ void game_task(void *p) {
         clear_screen_display();
         game_screen_state = SCORECARD;
       }
-#ifdef TEST
-      puts("JERRY_SCREEN_EXIT");
-#endif
-      xSemaphoreGive(catchsuccess_sound);
-
       break;
 
     case JERRYWON:
@@ -150,13 +147,15 @@ void game_task(void *p) {
       puts("JERRYWON");
 
 #endif
+      pause_or_stop = true;
+      change_level = true;
+      jerry_won_display();
+      sound.catchfail = true;
 
-      xSemaphoreGive(catchfail_sound);
       if (tom_lives > 1) {
         tom_lives--;
         row_count = 1;
         col_count = 1;
-        clear_screen_display();
         game_screen_state = GAME_ON;
       } else {
         // tom_lives = 3;
@@ -170,13 +169,13 @@ void game_task(void *p) {
 #ifdef TEST
       puts("SCORECARD");
 #endif
-      // tom_won_display();
       jerry_won_display();
-      xSemaphoreGive(game_sound);
-      // if (change_state) {
-      //   change_state = false;
-      //   game_screen_state = START_SCREEN;
-      // }
+      sound.scorecard = true;
+      if (change_state) {
+        change_state = false;
+        clear_screen_display();
+        game_screen_state = START_SCREEN;
+      }
       break;
 
     default:
