@@ -11,11 +11,6 @@
 #define MAX_BYTES_TX 32U
 
 extern SemaphoreHandle_t mp3_mutex;
-extern SemaphoreHandle_t default_sound;
-extern SemaphoreHandle_t game_sound;
-extern SemaphoreHandle_t catchsuccess_sound;
-extern SemaphoreHandle_t catchfail_sound;
-extern SemaphoreHandle_t score_sound;
 extern QueueHandle_t mp3_queue;
 
 FIL file;

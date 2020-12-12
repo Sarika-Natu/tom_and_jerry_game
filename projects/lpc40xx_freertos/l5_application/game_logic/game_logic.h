@@ -15,6 +15,8 @@ extern void game_task(void *p);
 
 extern void jerry_motion(void *p);
 
+void game_mode_on(void);
+
 struct object_axis {
   uint8_t x;
   uint8_t y;
@@ -26,3 +28,7 @@ extern bool game_on;
 extern bool game_on_after_pause;
 
 extern bool pause_or_stop;
+
+extern bool change_level;
+
+typedef void (*maze_selection_t)(void);
