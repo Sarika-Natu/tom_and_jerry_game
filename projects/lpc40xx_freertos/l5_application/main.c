@@ -1,24 +1,18 @@
 #include "FreeRTOS.h"
-#include "game_logic.h"
-#include "task.h"
-//#include "acceleration.h"
 #include "board_io.h"
 #include "common_macros.h"
 #include "delay.h"
 #include "display_screen_RGB.h"
-#include "ff.h"
 #include "game_accelerometer.h"
-#include "game_level.h"
-#include "gpio.h"
-#include "i2c.h"
+#include "game_logic.h"
 #include "led_matrix.h"
 #include "mp3_decoder.h"
 #include "periodic_scheduler.h"
 #include "queue.h"
 #include "semphr.h"
 #include "sj2_cli.h"
+#include "task.h"
 
-#define CODE
 #define READ_BYTES_FROM_FILE 512U
 #define MAX_BYTES_TX 32U
 #define JERRY_START_POSITION 12U
@@ -27,7 +21,6 @@
 
 extern struct object_axis tom;
 
-//#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
 QueueHandle_t mp3_queue = NULL;
 xTaskHandle jerry_motion_suspend;
@@ -106,23 +99,5 @@ void RGB_task(void *params) {
       up_move = true;
       game_on_after_pause = false;
     }
-  }
-}
-
-void jerry_motion(void *params) {
-  while (1) {
-    if (game_on) {
-
-      jerry_image();
-
-#ifdef TEST
-      fprintf(stderr, "jerry moving\n");
-#endif
-
-    } else {
-      // printf("jerry not moving\n");
-    }
-
-    vTaskDelay(1);
   }
 }

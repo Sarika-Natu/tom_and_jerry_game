@@ -96,7 +96,7 @@ void read_song(void *p) {
     else if ((sound.game) && (current_state != GAME)) {
       result = f_close(&file);
       if (0 != result) {
-        // printf("File not closed %i\n", result);
+        printf("File not closed %i\n", result);
       }
       result = f_findfirst(&dj, &fno, "", "2.mp3");
 #ifdef TEST
@@ -118,7 +118,7 @@ void read_song(void *p) {
     else if ((sound.entry) && (current_state != DEFAULT)) {
       result = f_close(&file);
       if (0 != result) {
-        // printf("File not closed %i\n", result);
+        printf("File not closed %i\n", result);
       }
       result = f_findfirst(&dj, &fno, "", "1.mp3");
 #ifdef TEST
@@ -141,7 +141,7 @@ void read_song(void *p) {
     result =
         f_read(&file, &bytes_to_read[0], READ_BYTES_FROM_FILE, &bytes_read);
     if (0 != result) {
-      // printf("Result of read is %i\n", result);
+      printf("Result of read is %i\n", result);
     }
 
     xSemaphoreGive(mp3_mutex);

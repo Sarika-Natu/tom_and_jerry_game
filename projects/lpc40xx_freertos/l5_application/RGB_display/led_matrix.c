@@ -1,7 +1,6 @@
 #include "led_matrix.h"
 #include "delay.h"
 #include "ff.h"
-#include "game_level.h"
 #include "game_logic.h"
 #include "gpio.h"
 #include "matrix_look_up_table.h"
@@ -17,7 +16,7 @@ bool up_move;
 bool down_move;
 extern struct object_axis jerry;
 const uint8_t jerry_start_position = 12;
-
+uint8_t const jerry_end_positions[3] = {211, 128, 181};
 uint8_t jerry_motion_counter = 0;
 
 void disable_display(void) { gpio__set(RGB.OE); }
