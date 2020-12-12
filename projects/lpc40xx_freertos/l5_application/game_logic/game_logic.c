@@ -27,7 +27,7 @@ enum game_state {
 
 maze maze1 = {{16, 2}, {26, 56}};
 maze maze2 = {{19, 2}, {2, 54}};
-maze maze3 = {{14, 2}, {27, 28}};
+maze maze3 = {{14, 2}, {27, 38}};
 
 uint8_t game_screen_state = START_SCREEN;
 bool game_on = false;
