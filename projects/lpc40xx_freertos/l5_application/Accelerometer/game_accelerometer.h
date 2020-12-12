@@ -1,5 +1,8 @@
 #pragma once
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -11,15 +14,13 @@ typedef enum {
   Landscape_LEFT = 6,
 } orientation_e;
 
-// Data for x-axis, y-axis, and z-axis
-typedef struct {
-  int16_t x, y, z;
-} acceleration__axis_data_s;
+extern uint8_t col_count;
+extern uint8_t row_count;
+extern bool right_move;
+extern bool left_move;
+extern bool up_move;
+extern bool down_move;
+extern SemaphoreHandle_t movement_counter;
 
-/// Enables acceleration sensor data update and returns true if we successfully
-/// detected the sensor
 bool acceleration__init(void);
-
-/// @returns data of all 3-axis of the sensor
-// acceleration__axis_data_s acceleration__get_data(void);
-orientation_e acceleration_get_data(void);
+void action_on_orientation(void *p);

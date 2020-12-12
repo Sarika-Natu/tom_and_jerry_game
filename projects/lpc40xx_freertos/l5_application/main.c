@@ -25,22 +25,7 @@
 
 // #define TEST
 
-bool command_up = true;
-bool command_down = true;
-bool command_left = true;
-bool command_right = true;
-
 extern struct object_axis tom;
-
-void action_on_orientation(void *p);
-SemaphoreHandle_t movement_counter = NULL;
-SemaphoreHandle_t rgb_owner = NULL;
-void left_movement(void);
-void right_movement(void);
-void up_movement(void);
-void down_movement(void);
-uint8_t col_count = 1;
-uint8_t row_count = 1;
 
 //#define TEST
 SemaphoreHandle_t mp3_mutex = NULL;
@@ -49,6 +34,7 @@ xTaskHandle jerry_motion_suspend;
 
 SemaphoreHandle_t button_pressed_signal = NULL;
 SemaphoreHandle_t change_game_state = NULL;
+SemaphoreHandle_t movement_counter = NULL;
 
 static void RGB_task(void *params);
 void button_task(void *p);
@@ -140,89 +126,3 @@ void jerry_motion(void *params) {
     vTaskDelay(1);
   }
 }
-
-/*******************************************************************/
-/*                       ACCELEROMETER                             */
-/*******************************************************************/
-void action_on_orientation(void *p) {
-  orientation_e value;
-
-  while (1) {
-    value = acceleration_get_data();
-
-    switch (value) {
-    case Landscape_LEFT:
-      command_left = true;
-      if (left_move) {
-        left_movement();
-      }
-      left_move = true;
-      break;
-    case Landscape_RIGHT:
-      command_right = true;
-      if (right_move) {
-        right_movement();
-      }
-      right_move = true;
-      break;
-    case Back_Orientation:
-
-      break;
-    case Front_Orientation:
-
-      break;
-    case Portrait_DOWN:
-      command_down = true;
-      if (down_move) {
-        down_movement();
-      }
-      down_move = true;
-      break;
-    default:
-      command_up = true;
-      if (up_move) {
-        up_movement();
-      }
-      up_move = true;
-      break;
-    }
-    vTaskDelay(100);
-    tom_move_on_maze(row_count, col_count);
-  }
-}
-
-void left_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    col_count--;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-
-void right_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    col_count++;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-void down_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    row_count++;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-
-void up_movement(void) {
-  if (xSemaphoreTake(movement_counter, portMAX_DELAY)) {
-
-    row_count--;
-  }
-
-  xSemaphoreGive(movement_counter);
-}
-/*******************************************************************/

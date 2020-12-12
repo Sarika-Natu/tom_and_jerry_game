@@ -5,6 +5,7 @@
 #include "stdbool.h"
 #include "stdint.h"
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,11 +15,6 @@
 #define LEDMATRIX_HALF_HEIGHT 16
 #define LEDMATRIX_HALF_WIDTH 32
 
-extern bool right_move;
-extern bool left_move;
-extern bool up_move;
-extern bool down_move;
-
 extern bool command_up;
 extern bool command_down;
 extern bool command_left;
@@ -27,8 +23,6 @@ extern bool command_right;
 extern uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH];
 extern uint8_t col_count;
 extern uint8_t row_count;
-
-// extern uint8_t counter;
 
 extern struct object_axis tom;
 
@@ -94,3 +88,8 @@ void tom_image_2(uint8_t x, uint8_t y);
 void tom_image(uint8_t x, uint8_t y);
 void tom_move_on_maze(uint8_t x, uint8_t y);
 void maze_one_frame_one(void);
+
+extern bool command_up;
+extern bool command_down;
+extern bool command_left;
+extern bool command_right;
