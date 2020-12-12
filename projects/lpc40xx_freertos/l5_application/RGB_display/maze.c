@@ -46,7 +46,7 @@ void maze_two_frame(void) {
   } else {
     row_counter_set_maze_two = 0;
   }
-  vTaskDelay(2);
+  vTaskDelay(1);
 }
 
 void maze_three_frame(void) {
@@ -64,5 +64,5 @@ void maze_three_frame(void) {
   } else {
     row_counter_set_maze_three = 0;
   }
-  vTaskDelay(2);
+  vTaskDelay(1);
 }
