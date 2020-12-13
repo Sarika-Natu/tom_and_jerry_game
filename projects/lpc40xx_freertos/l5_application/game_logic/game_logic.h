@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define LEDMATRIX_HEIGHT 32
-#define LEDMATRIX_WIDTH 64
+#define LEDMATRIX_HEIGHT 32U
+#define LEDMATRIX_WIDTH 64U
 
 struct object_axis {
   uint8_t x;

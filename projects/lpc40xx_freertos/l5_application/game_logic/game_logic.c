@@ -329,5 +329,4 @@ static void player_failed(void) {
   default:
     break;
   }
-
 }

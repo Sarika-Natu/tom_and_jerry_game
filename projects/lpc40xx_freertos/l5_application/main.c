@@ -15,8 +15,6 @@
 
 #define READ_BYTES_FROM_FILE 512U
 
-// #define TEST
-
 SemaphoreHandle_t mp3_mutex = NULL;
 QueueHandle_t mp3_queue = NULL;
 xTaskHandle jerry_motion_suspend;
