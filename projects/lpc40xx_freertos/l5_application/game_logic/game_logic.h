@@ -1,4 +1,3 @@
-#include "matrix_look_up_table.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>

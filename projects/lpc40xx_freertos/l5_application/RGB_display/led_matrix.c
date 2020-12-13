@@ -3,7 +3,7 @@
 #include "ff.h"
 #include "game_logic.h"
 #include "gpio.h"
-#include "matrix_look_up_table.h"
+#include "maze.h"
 RGB_gpio RGB = {{2, 0}, {2, 1}, {2, 2},  {2, 5},  {2, 4},  {0, 15}, {2, 7},
                 {2, 8}, {2, 9}, {0, 16}, {1, 23}, {1, 20}, {1, 28}};
 uint8_t RGB_A, RGB_B, RGB_C, RGB_D;

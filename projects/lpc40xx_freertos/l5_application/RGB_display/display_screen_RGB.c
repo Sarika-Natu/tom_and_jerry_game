@@ -2,7 +2,7 @@
 #include "delay.h"
 #include "ff.h"
 #include "led_matrix.h"
-#include "matrix_look_up_table.h"
+#include "maze.h"
 
 static uint8_t row_counter_start_screen = 0;
 static uint8_t row_counter_pause_screen = 0;
