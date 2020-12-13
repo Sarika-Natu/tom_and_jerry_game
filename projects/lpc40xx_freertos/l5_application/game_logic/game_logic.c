@@ -171,6 +171,7 @@ void game_task(void *p) {
       change_level = true;
       sound.catchfail = true;
       if (tom_lives > 1) {
+
         tom_lives--;
         row_count = 1;
         col_count = 1;
