@@ -138,6 +138,9 @@ void level_display(void) {
       } else if ((next_level_display_lookup_table[row_counter_level_screen]
                                                  [col]) == 5) {
         set_pixel(row_counter_level_screen, col, PINK);
+      } else if ((next_level_display_lookup_table[row_counter_level_screen]
+                                                 [col]) == 1) {
+        set_pixel(row_counter_level_screen, col, RED);
       }
     }
     row_counter_level_screen++;
@@ -154,8 +157,8 @@ void game_over_display(void) {
   if (row_counter_game_over_screen < LEDMATRIX_HEIGHT) {
     for (uint8_t col = 0; col < LEDMATRIX_WIDTH; col++) {
       if ((game_over_display_lookup_table[row_counter_game_over_screen][col]) ==
-          2) {
-        set_pixel(row_counter_game_over_screen, col, GREEN);
+          1) {
+        set_pixel(row_counter_game_over_screen, col, RED);
 
       } else if ((game_over_display_lookup_table[row_counter_game_over_screen]
                                                 [col]) == 7) {
