@@ -79,7 +79,7 @@ void game_task(void *p) {
 
     case PLAYER_READY:
 #ifdef TEST
-      puts("LEVEL_SCREEN");
+      puts("PLAYER_READY_SCREEN");
 #endif
       player_ready_display();
 
@@ -107,8 +107,6 @@ void game_task(void *p) {
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
-      fprintf(stderr, "Jerry.x = %d | Jerry.y =%d | motion_counter=%d \n",
-              jerry.x, jerry.y, jerry_motion_counter);
 #endif
       maze_lookup_table[level]();
       change_level = false;
@@ -144,7 +142,7 @@ void game_task(void *p) {
 
     case TOM_WON:
 #ifdef TEST
-      puts("TOMWON");
+      puts("TOM WON");
 #endif
       tom_lives = THREE_LIVES;
       pause_or_stop = true;
@@ -167,7 +165,7 @@ void game_task(void *p) {
 
     case JERRY_WON:
 #ifdef TEST
-      puts("JERRYWON");
+      puts("JERRY WON");
 #endif
       pause_or_stop = true;
       change_level = true;
@@ -186,7 +184,7 @@ void game_task(void *p) {
 
     case SCORE_CARD:
 #ifdef TEST
-      puts("SCORECARD");
+      puts("SCORE CARD");
 #endif
       if (tom_or_jerry_won_decision) {
         game_over_display();
@@ -250,7 +248,6 @@ void setup_button_isr(void) {
 }
 
 static void collision_detector(void) {
-  // Tom bottom collide with Jerry coordinates
   if ((jerry.x == tom.x + 3 && jerry.y == tom.y + 2) ||
       (jerry.x + 1 == tom.x + 3 && jerry.y + 1 == tom.y + 2) ||
       (jerry.x + 2 == tom.x + 3 && jerry.y == tom.y + 2) ||
@@ -260,35 +257,28 @@ static void collision_detector(void) {
 #endif
     game_screen_state = TOM_WON;
     clear_screen_display();
-  }
-  // Tom right collide with Jerry coordinates
-  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 3) ||
-           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
+  } else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 3) ||
+             (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
 #ifdef TEST
     puts("Collision detect - Tom Won");
 #endif
     game_screen_state = TOM_WON;
     clear_screen_display();
-  }
-
-  // Tom left  collide with Jerry coordinates
-  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 1) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 1) ||
-           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
+  } else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 1) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 1) ||
+             (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
 #ifdef TEST
     puts("Collision detect - Tom Won");
 #endif
     game_screen_state = TOM_WON;
     clear_screen_display();
-  }
-  // Tom top collide with Jerry coordinates
-  else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
-           (jerry.x + 1 == tom.x + 1 && jerry.y + 1 == tom.y + 2) ||
-           (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
-           (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
+  } else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
+             (jerry.x + 1 == tom.x + 1 && jerry.y + 1 == tom.y + 2) ||
+             (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
+             (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
 #ifdef TEST
     puts("Collision detect - Tom Won");
 #endif
