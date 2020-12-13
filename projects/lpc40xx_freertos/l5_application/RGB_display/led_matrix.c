@@ -8,6 +8,7 @@
 RGB_gpio RGB = {{2, 0}, {2, 1}, {2, 2},  {2, 5},  {2, 4},  {0, 15}, {2, 7},
                 {2, 8}, {2, 9}, {0, 16}, {1, 23}, {1, 20}, {1, 28}};
 
+#define JERRY_START_POSITION 12U
 uint8_t display_matrix[LEDMATRIX_HALF_HEIGHT][LEDMATRIX_WIDTH] = {0};
 
 bool right_move;
@@ -18,6 +19,35 @@ extern struct object_axis jerry;
 const uint8_t jerry_start_position = 12;
 uint8_t const jerry_end_positions[3] = {211, 128, 181};
 uint8_t jerry_motion_counter = 0;
+
+void RGB_task(void *params) {
+  while (1) {
+    update_display();
+    vTaskDelay(5);
+    if (change_level) {
+      vTaskSuspend(jerry_motion_suspend);
+      jerry_motion_counter = JERRY_START_POSITION;
+    } else {
+
+      vTaskResume(jerry_motion_suspend);
+    }
+    if (pause_or_stop) {
+      vTaskSuspend(jerry_motion_suspend);
+      left_move = false;
+      right_move = false;
+      down_move = false;
+      up_move = false;
+      pause_or_stop = false;
+    } else if (game_on_after_pause) {
+      vTaskResume(jerry_motion_suspend);
+      left_move = true;
+      right_move = true;
+      down_move = true;
+      up_move = true;
+      game_on_after_pause = false;
+    }
+  }
+}
 
 void disable_display(void) { gpio__set(RGB.OE); }
 

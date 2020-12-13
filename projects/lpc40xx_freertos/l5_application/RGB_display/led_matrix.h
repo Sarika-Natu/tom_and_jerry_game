@@ -1,9 +1,11 @@
 #pragma once
 // led_display_driver.h
+#include "FreeRTOS.h"
 #include "gpio.h"
 #include "lpc40xx.h"
 #include "stdbool.h"
 #include "stdint.h"
+#include "task.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -58,6 +60,7 @@ typedef struct {
 } RGB_gpio;
 
 extern uint8_t jerry_motion_counter;
+extern xTaskHandle jerry_motion_suspend;
 
 void gpio_init(void);
 
