@@ -3,7 +3,6 @@
 #include "delay.h"
 #include "display_screen_RGB.h"
 #include "game_accelerometer.h"
-#include "game_level.h"
 #include "gpio.h"
 #include "gpio_isr.h"
 #include "led_matrix.h"
@@ -12,6 +11,9 @@
 #include "maze.h"
 #include "mp3_decoder.h"
 #include "semphr.h"
+
+#define THREE_LIVES 3
+#define GAME_LEVELS 3
 
 // #define TEST
 enum game_state {
@@ -24,30 +26,28 @@ enum game_state {
   JERRY_WON = 6,
   SCORE_CARD = 7
 };
+
+maze maze1 = {{16, 2}, {26, 56}};
+maze maze2 = {{19, 2}, {2, 54}};
+maze maze3 = {{14, 2}, {27, 38}};
+
 uint8_t game_screen_state = START_SCREEN;
 bool game_on = false;
-
 bool pause_or_stop = false;
 bool game_on_after_pause = false;
 bool change_level = false;
+
 extern SemaphoreHandle_t button_pressed_signal;
 extern SemaphoreHandle_t change_game_state;
 
-uint8_t const jerry_end_position_1 = 211;
-uint8_t const jerry_end_position_2 = 128;
-uint8_t const jerry_end_position_3 = 181;
-
-uint8_t previous_game_mode = 0;
-uint8_t const jerry_end_positions[3] = {
-    jerry_end_position_1, jerry_end_position_2, jerry_end_position_3};
 uint8_t level = 0;
-uint8_t tom_lives = 3;
+uint8_t tom_lives = THREE_LIVES;
 maze_selection_t maze_lookup_table[3] = {maze_one_frame, maze_two_frame,
                                          maze_three_frame};
 bool tom_or_jerry_won_decision = false;
 
-void collision_detector(void);
-void player_failed(void);
+static void collision_detector(void);
+static void player_failed(void);
 
 void game_task(void *p) {
 #ifdef TEST
@@ -79,7 +79,7 @@ void game_task(void *p) {
 
     case PLAYER_READY:
 #ifdef TEST
-      puts("LEVEL_SCREEN");
+      puts("PLAYER_READY_SCREEN");
 #endif
       player_ready_display();
 
@@ -107,7 +107,6 @@ void game_task(void *p) {
     case GAME_ON:
 #ifdef TEST
       puts("GAME_SCREEN");
-
 #endif
       maze_lookup_table[level]();
       change_level = false;
@@ -143,13 +142,13 @@ void game_task(void *p) {
 
     case TOM_WON:
 #ifdef TEST
-      puts("TOMWON");
+      puts("TOM WON");
 #endif
-      tom_lives = 3;
+      tom_lives = THREE_LIVES;
       pause_or_stop = true;
       sound.catchsuccess = true;
       change_level = true;
-      if (level < 2) {
+      if (level < (GAME_LEVELS - 1)) {
         clear_screen_display();
         level++;
         row_count = 1;
@@ -166,14 +165,11 @@ void game_task(void *p) {
 
     case JERRY_WON:
 #ifdef TEST
-      puts("JERRYWON");
-
+      puts("JERRY WON");
 #endif
-
       pause_or_stop = true;
       change_level = true;
       sound.catchfail = true;
-
       if (tom_lives > 1) {
 
         tom_lives--;
@@ -185,12 +181,11 @@ void game_task(void *p) {
         clear_screen_display();
         game_screen_state = SCORE_CARD;
       }
-
       break;
 
     case SCORE_CARD:
 #ifdef TEST
-      puts("SCORECARD");
+      puts("SCORE CARD");
 #endif
       if (tom_or_jerry_won_decision) {
         game_over_display();
@@ -220,6 +215,20 @@ void game_task(void *p) {
   vTaskDelay(500);
 }
 
+void jerry_motion(void *params) {
+  while (1) {
+    if (game_on) {
+      jerry_image();
+#ifdef TEST
+      fprintf(stderr, "jerry moving\n");
+#endif
+    } else {
+      // printf("jerry not moving\n");
+    }
+    vTaskDelay(1);
+  }
+}
+
 void button_isr(void) { xSemaphoreGiveFromISR(button_pressed_signal, NULL); }
 
 void button_task(void *p) {
@@ -239,82 +248,85 @@ void setup_button_isr(void) {
   gpio__attach_interrupt(GPIO__PORT_0, 29, GPIO_INTR__FALLING_EDGE, button_isr);
 }
 
-void collision_detector(void) {
-
-  // Tom botton collide with Jerry cordinates
+static void collision_detector(void) {
   if ((jerry.x == tom.x + 3 && jerry.y == tom.y + 2) ||
       (jerry.x + 1 == tom.x + 3 && jerry.y + 1 == tom.y + 2) ||
       (jerry.x + 2 == tom.x + 3 && jerry.y == tom.y + 2) ||
       (jerry.x + 1 == tom.x + 3 && jerry.y == tom.y + 2)) {
+#ifdef TEST
     puts("Collision detect - Tom Won");
+#endif
     game_screen_state = TOM_WON;
     clear_screen_display();
-  }
-  // Tom right collide with Jerry cordinates
-  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 3) ||
-           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
+  } else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 3) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 3) ||
+             (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 3) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 3)) {
+#ifdef TEST
     puts("Collision detect - Tom Won");
+#endif
     game_screen_state = TOM_WON;
     clear_screen_display();
-  }
-
-  // Tom left  collide with Jerry cordinates
-  else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 1) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 1) ||
-           (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
-           (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
+  } else if ((jerry.x == tom.x + 2 && jerry.y == tom.y + 1) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y + 1 == tom.y + 1) ||
+             (jerry.x + 2 == tom.x + 2 && jerry.y == tom.y + 1) ||
+             (jerry.x + 1 == tom.x + 2 && jerry.y == tom.y + 1)) {
+#ifdef TEST
     puts("Collision detect - Tom Won");
+#endif
     game_screen_state = TOM_WON;
     clear_screen_display();
-  }
-  // Tom top collide with Jerry cordinates
-  else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
-           (jerry.x + 1 == tom.x + 1 && jerry.y + 1 == tom.y + 2) ||
-           (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
-           (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
+  } else if ((jerry.x == tom.x + 1 && jerry.y == tom.y + 2) ||
+             (jerry.x + 1 == tom.x + 1 && jerry.y + 1 == tom.y + 2) ||
+             (jerry.x + 2 == tom.x + 1 && jerry.y == tom.y + 2) ||
+             (jerry.x + 1 == tom.x + 1 && jerry.y == tom.y + 2)) {
+#ifdef TEST
     puts("Collision detect - Tom Won");
+#endif
     game_screen_state = TOM_WON;
     clear_screen_display();
   }
 }
 
-void player_failed(void) {
+static void player_failed(void) {
   switch (level) {
   case 0:
-    if ((jerry.x == 26) && (jerry.y == 56)) {
+    if ((jerry.x == maze1.end.x) && (jerry.y == maze1.end.y)) {
+#ifdef TEST
       puts("Jerry reached home - Jerry Won");
-      jerry.x = 16;
-      jerry.y = 2;
+#endif
+      jerry.x = maze1.start.x;
+      jerry.y = maze1.start.y;
       change_level = true;
       game_screen_state = JERRY_WON;
       clear_screen_display();
     }
     break;
   case 1:
-    if ((jerry.x == 2) && (jerry.y == 54)) {
+    if ((jerry.x == maze2.end.x) && (jerry.y == maze2.end.y)) {
+#ifdef TEST
       puts("Jerry reached home - Jerry Won");
-      jerry.x = 19;
-      jerry.y = 2;
+#endif
+      jerry.x = maze2.start.x;
+      jerry.y = maze2.start.y;
       change_level = true;
       game_screen_state = JERRY_WON;
       clear_screen_display();
     }
     break;
   case 2:
-    if ((jerry.x == 27) && (jerry.y == 38)) {
+    if ((jerry.x == maze3.end.x) && (jerry.y == maze3.end.y)) {
+#ifdef TEST
       puts("Jerry reached home - Jerry Won");
-      jerry.x = 14;
-      jerry.y = 2;
+#endif
+      jerry.x = maze3.start.x;
+      jerry.y = maze3.start.y;
       change_level = true;
       game_screen_state = JERRY_WON;
       clear_screen_display();
     }
     break;
-
   default:
-
     break;
   }
 }

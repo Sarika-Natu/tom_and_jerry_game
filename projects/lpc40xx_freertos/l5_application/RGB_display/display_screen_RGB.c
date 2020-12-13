@@ -2,15 +2,14 @@
 #include "delay.h"
 #include "ff.h"
 #include "led_matrix.h"
-#include "matrix_look_up_table.h"
+#include "maze.h"
 
-uint8_t row_counter_start_screen = 0;
-uint8_t row_counter_pause_screen = 0;
-uint8_t row_counter_jerry_won = 0;
-uint8_t row_counter_level_screen = 0;
-uint8_t row_counter_game_over_screen = 0;
-uint8_t row_counter_player_won_screen = 0;
-uint8_t row_counter_player_ready_screen = 0;
+static uint8_t row_counter_start_screen = 0;
+static uint8_t row_counter_pause_screen = 0;
+static uint8_t row_counter_level_screen = 0;
+static uint8_t row_counter_game_over_screen = 0;
+static uint8_t row_counter_player_won_screen = 0;
+static uint8_t row_counter_player_ready_screen = 0;
 
 void start_screen_display(void) {
 
